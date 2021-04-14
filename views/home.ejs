@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Home</title>
+        <script src="../jquery.min.js"></script>
+        <link   href="../main.css" rel="stylesheet">
+
+        <link   href="../dialogs.css" rel="stylesheet">
+        <script src="../dialogs.js"></script>
+
+        <style>
+            nav {
+                background: #154d15; // green
+                padding: 20px 10px;
+            }
+
+            main ul {
+                background: #154d15;
+            }
+
+            table {
+                border-collapse: collapse;
+                font-size: 18px;
+                width: 100%;
+            }
+
+            table tr th {
+                background-color: #00b33c;
+                font-size: 20px;
+            }
+
+            table tr:nth-child(odd) {
+                background: #99ffbb;
+            }
+
+            table tr:nth-child(even) {
+                background: #ccffdd;
+            }
+
+            .btn {
+                background-color: #8a5188;
+            }
+
+            .local-btn {
+                background-color: #00802b;
+            }
+
+            .link{cursor:pointer; color:blue;}
+
+
+            .dialog_header {
+                background-color: #7a2c78;
+            }
+
+            .dialog_content {
+                background-color: #8a5188;
+            }
+
+            .dialog_footer {
+                background-color: #7a2c78;
+            }
+
+            .dialog_close_btn {
+                color: #8a5188;
+            }
+        </style>
+
+        <script>
+            const OPTS = {
+                itemName: 'order',
+                itemId: 'id',
+                urls: {
+                    add: '/api/orders/add',
+                    delete: '/api/orders/delete'
+                }
+            };
+
+
+
+            function addItem(items, item) {
+                const str = `<tr class='element' element_id=${item.id}><td>${item.id}</td><td>${item.name}</td><td>${item.phone}</td><td class='link' onclick=main.deleteItem(${item.id})>delete</td></tr>`;
+                items = items.add(str);
+                return items;
+            }
+
+
+
+            function loadItems() {
+                //console.log('loadItems()');
+                const data = {};
+                $.ajax(
+                    {
+                        type: 'GET',
+                        url: '/api/orders',
+                        data:data
+                    }
+                ).done((result)=>{
+                    //console.log('loadItems(), SUCCESS:', result);
+
+                    let items = $();
+                    const keys = Object.keys(result);
+                    keys.forEach((k)=>{
+                        items = addItem(items, {id:k, name:result[k].name, phone:result[k].phone});
+                    });
+
+                    const elements = $('#id_elements');
+                    elements.append(items);
+                }).fail((result)=>{
+                    const err = `status:${result.status}, text:${result.statusText}`;
+                    //console.log('loadItems(), FAILURE:', err);
+                });
+            }
+
+
+
+            // https://www.w3schools.com/howto/howto_css_modals.asp
+            // https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_modal
+            class DialogAdd extends DialogExec {
+                constructor(opts) {
+                    super('id_dialog_add');
+                    this.opts = opts || {};
+                }
+
+                run() {
+                    console.log('DialogAdd.run()');
+                    this.setHeaderText(`Add new ${this.opts.itemName}`);
+                    this.show();
+
+                    // Setup focus to 1st input element
+                    const s = this.dialog.find('.dialog_content input');
+                    Object.values(s)[0].focus();
+
+                    this._promise = new DeferredPromise();
+                    return this._promise;
+                }
+
+                exec() {
+                    console.log('DialogAdd.exec()');
+                    return new Promise((resolve, reject) => {
+                        const data = {};
+                        const values = this.dialog.find('.dialog_content input');
+                        values.each((index, v)=>{
+                            data[v.name] = v.value;
+                        });
+                        console.log('DialogAdd.exec, data:', data);
+                        $.post(
+                            {
+                                url:this.opts.urls.add,
+                                data:data
+                            },
+                        ).done((result)=>{
+                            console.log('DialogAdd.exec, SUCCESS:', result);
+
+                            let items = $();
+                            const item={};
+                            values.each((index, v)=>{
+                                item[v.name] = v.value;
+                            });
+                            items = addItem(items, item);
+                            const elements = $('#id_elements');
+                            elements.append(items);
+
+                            resolve(result);
+                        }).fail((result)=>{
+                            const err = `status:${result.status}, text:${result.responseText}`;
+                            console.log('DialogAdd.exec, FAILURE, err:', err);
+                            reject(err);
+                        });
+                    });
+                }
+            }
+
+
+
+            class DialogDelete extends DialogExec {
+                constructor(opts) {
+                    super('id_dialog_delete');
+                    this.opts = opts;
+                }
+
+                run(id) {
+                    console.log(`DialogDelete.run(), id:${id}`);
+                    this.elementId = id;
+                    this.setHeaderText(`Delete ${this.opts.itemName} ${this.elementId} ?`);
+                    this.show();
+
+                    this._promise = new DeferredPromise();
+                    return this._promise;
+                }
+
+                exec() {
+                    console.log('DialogDelete.exec()');
+                    return new Promise((resolve, reject) => {
+                        const data = {};
+                        data[this.opts.itemId] = this.elementId;
+                        console.log('DialogDelete.exec, data:', data);
+                        $.ajax(
+                            {
+                                type: 'DELETE',
+                                url:this.opts.urls.delete,
+                                data:data
+                            }
+                        ).done((result)=>{
+                            console.log('DialogDelete.exec, SUCCESS:', result);
+                            resolve(result);
+                        }).fail((result)=>{
+                            const err = `status:${result.status}, text:${result.statusText}`;
+                            reject(err);
+                        });
+                    });
+                }
+            }
+
+
+
+            const errorHandler = function(err) {
+                console.log('errorHandler, err:', err);
+                var dialogFailure = dialogFailure || new DialogFailure();
+                dialogFailure.run({text:err}).then(()=>{});
+            }
+
+
+
+            let main;
+
+            const Main = function() {
+                console.log('Main()');
+
+
+
+                // Add dialog
+                this.dialogAdd = new DialogAdd(OPTS);
+                $('#id_add_btn').click(()=>{
+                    this.dialogAdd.run()
+                        .then((result)=>{
+                            if(result!=='Closed') {
+                            }
+                        })
+                        .catch(errorHandler);
+                });
+
+
+
+                // Delete dialog
+                this.dialogDelete = new DialogDelete(OPTS);
+                this.deleteItem = (id) =>{
+                    console.log('Main.deleteItem(), id:' + id);
+                    this.dialogDelete.run(id)
+                        .then((result)=>{
+                            if(result!=='Closed') {
+                                $(`.element[element_id=${id}]`).remove();
+                            }
+                        })
+                        .catch(errorHandler);
+                }
+
+
+
+                loadItems();
+            }
+
+
+
+            $(document).ready(()=>{main = new Main});
+
+        </script>
+    <head>
+
+    <body>
+
+
+
+        <nav>
+        </nav>
+
+
+
+        <header>
+        </header>
+
+
+
+        <main>
+
+            <div class='left'>
+                <button id='id_add_btn' class='btn local-btn'>Add</button>
+            </div>
+
+            <table id='id_elements'>
+                <tr>
+                    <th>order id</th>
+                    <th>client name</th>
+                    <th>phone no</th>
+                    <th>delete</th>
+                </tr>
+            </table>
+        </main>
+
+
+
+        <dialogs>
+            <div id='id_dialog_add' class='dialog'>
+                <div class='dialog_header'>
+                    <div class='dialog_close_btn'>&times;</div>
+                    <div class='dialog_header_text'></div>
+                </div>
+                <div class='dialog_content'>
+
+                    <div>
+                        <div class='inline'>order id</div>
+                        <input class='inline' type='text' name='id' value=''>
+                    </div>
+
+                    <div>
+                        <div class='inline'>customer</div>
+                        <input class='inline' type='text' name='name' value=''>
+                    </div>
+
+                    <div>
+                        <div class='inline'>phone</div>
+                        <input class='inline' type='text' name='phone' value=''>
+                    </div>
+
+                </div>
+                <div class='dialog_footer'>
+                    <div class='btn'>Add</div>
+                </div>
+            </div>
+
+
+
+            <div id='id_dialog_delete' class='dialog'>
+                <div class='dialog_header'>
+                    <div class='dialog_close_btn'>&times;</div>
+                    <div class='dialog_header_text'></div>
+                </div>
+                <div class='dialog_footer'>
+                    <div class='btn'>Delete</div>
+                </div>
+            </div>
+
+
+
+            <div id='id_dialog_failure' class='dialog'>
+                <div class='dialog_header fuckup'>
+                    <div class='dialog_close_btn fuckup'>&times;</div>
+                    <div class='dialog_header_text fuckup'></div>
+                </div>
+                <div class='dialog_content fuckup'/>
+            </div>
+
+        </dialogs>
+
+    <body>
+
+</html>
+

@@ -26,9 +26,13 @@ module.exports = function (api) {
 //      console.log(`${this._logPrefix}.handle, phone:${phone}`);
 
         const orders = req.app.zzz.model.orders;
-        orders[id] = {name:name, phone:phone};
 
-        res.status(200).json(orders[id]);
+        if (typeof orders[id] == 'undefined') {
+            orders[id] = {name:name, phone:phone};
+            res.status(200).json(orders[id]);
+        } else {
+            res.status(500).send(`Order ${id} already exists`);
+        }
     }
 
     return Handler;

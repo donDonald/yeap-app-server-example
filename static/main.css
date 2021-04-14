@@ -1,0 +1,71 @@
+
+body {
+    font-family: arial;
+    margin: 0;
+}
+
+nav {
+    background: #aaaaaa;
+    padding: 20px 10px;
+}
+
+nav ul {
+    max-width: 70%;
+    margin: 0 auto;
+    padding: 0;
+}
+
+nav li {
+    list-style-type: none;
+    display: inline-block;
+    margin: 0 10px 0 0;
+}
+
+nav li:hover{background-color:#0000FF;}
+//nav li:hover{opacity: 0.5;}
+
+nav a {
+    color: #fff;
+    font-size: 18px;
+    background: rgba(255,255,255,0.2);
+    text-decoration: none;
+    padding: 10px;
+    display: block;
+}
+
+main, header {
+    max-width: 70%;
+    margin: 30px auto;
+    padding: 0 10px; // ?PTFIXME: for home shall be commented out?
+    color: #333;
+}
+
+main ul {
+    background: #aaaaaa;
+    margin: 0 auto;
+    padding: 0;
+}
+
+main li {
+    list-style-type: none;
+    //display: inline-block;
+    margin: 0 0px 0 0;
+}
+
+main li:hover{background-color:#aaaaaa;}
+
+main a {
+    color: #fff;
+    font-size: 22px;
+    background: rgba(255,255,255,0.2);
+    text-decoration: none;
+    padding: 15px;
+    display: block;
+}
+
+main a:hover{background-color:#0000FF;}
+
+.nav_li_current {
+    font-size: 30px;
+}
+
