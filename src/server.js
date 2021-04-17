@@ -1,7 +1,8 @@
 'use strict';
 
 const assert = require('assert');
-const Application = require('yeap-app-server');
+const api = {};
+const Application = require('yeap-app-server')(api).Application;
 
 const openModel = function(api, cb) {
     const model = {};

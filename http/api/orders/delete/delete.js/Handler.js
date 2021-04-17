@@ -24,7 +24,6 @@ module.exports = function (api) {
 //      console.log(`${this._logPrefix}.handle, params:`, params);
 //      console.log(`${this._logPrefix}.handle, id:`, id);
         delete orders[id];
-        orders[id] = undefined;
 
         res.sendStatus(200);
     }

@@ -18,15 +18,19 @@ module.exports = function (api) {
 
         const orders = req.app.zzz.model.orders;
         let result = orders;
+        let code = 200;
 
         const id = req.query.id;
         if (id) {
             result = orders[id];
+            if (!result) {
+                code = 204;
+            }
         } else {
             result = orders;
         }
 
-        res.status(200).json(result);
+        res.status(code).json(result);
     }
 
     return Handler;

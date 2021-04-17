@@ -4,7 +4,7 @@
   "description": "",
   "main": "exports.js",
   "scripts": {
-    "test": "echo \"Error: no start specified\" && exit 1",
+    "test": "APP_ROOT=$(pwd) mocha 'src/tsrc/test.js' --timeout 10000",
     "start": "APP_ROOT=$(pwd) node ./src/server.js"
   },
   "keywords": [
