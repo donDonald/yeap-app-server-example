@@ -8,10 +8,10 @@ describe('http.api.orders.delete.delete.js', ()=>{
     let Router, Response, Delete;
 
     before(()=>{
-        api = require('yeap-app-server');
-        Router = api.lib.testTools.express.Router;
-        Response = api.lib.testTools.express.Response;
-        Delete = api.lib.testTools.express.Delete;
+        api = require('yeap_app_server');
+        Router = api.lib.express.Router;
+        Response = api.lib.express.Response;
+        Delete = api.lib.express.Delete;
     });
 
     let model, router, method;
@@ -21,7 +21,7 @@ describe('http.api.orders.delete.delete.js', ()=>{
             const ROUTE = '/api/orders/delete';
             const METHOD = 'DELETE';
             router = new Router();
-            method = api.lib.routerHelper.createHandler(router, 'http/api/orders/delete/delete.js');
+            method = api.app_server.routerHelper.createHandler(router, 'http/api/orders/delete/delete.js');
             assert.equal(method.route, ROUTE);
             assert.equal(method.method, METHOD);
 

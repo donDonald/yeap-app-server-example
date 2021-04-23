@@ -8,10 +8,10 @@ describe('http.api.orders.get.js', ()=>{
     let Router, Response, Get;
 
     before(()=>{
-        api = require('yeap-app-server');
-        Router = api.lib.testTools.express.Router;
-        Response = api.lib.testTools.express.Response;
-        Get = api.lib.testTools.express.Get;
+        api = require('yeap_app_server');
+        Router = api.lib.express.Router;
+        Response = api.lib.express.Response;
+        Get = api.lib.express.Get;
     });
 
     let model, router, method;
@@ -21,7 +21,7 @@ describe('http.api.orders.get.js', ()=>{
             const ROUTE = '/api/orders';
             const METHOD = 'GET';
             router = new Router();
-            method = api.lib.routerHelper.createHandler(router, 'http/api/orders/get.js');
+            method = api.app_server.routerHelper.createHandler(router, 'http/api/orders/get.js');
             assert.equal(method.route, ROUTE);
             assert.equal(method.method, METHOD);
 

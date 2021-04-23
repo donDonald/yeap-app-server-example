@@ -8,10 +8,10 @@ describe('http.api.orders.add.post.js', ()=>{
     let Router, Response, Post;
 
     before(()=>{
-        api = require('yeap-app-server');
-        Router = api.lib.testTools.express.Router;
-        Response = api.lib.testTools.express.Response;
-        Post = api.lib.testTools.express.Post;
+        api = require('yeap_app_server');
+        Router = api.lib.express.Router;
+        Response = api.lib.express.Response;
+        Post = api.lib.express.Post;
     });
 
     let model, router, method;
@@ -21,7 +21,7 @@ describe('http.api.orders.add.post.js', ()=>{
             const ROUTE = '/api/orders/add';
             const METHOD = 'POST';
             router = new Router();
-            method = api.lib.routerHelper.createHandler(router, 'http/api/orders/add/post.js');
+            method = api.app_server.routerHelper.createHandler(router, 'http/api/orders/add/post.js');
             assert.equal(method.route, ROUTE);
             assert.equal(method.method, METHOD);
 
