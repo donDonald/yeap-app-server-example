@@ -1,5 +1,5 @@
 {
-  "name": "yeap-app-server-example",
+  "name": "yeap_app_server_example",
   "version": "1.0.0",
   "description": "",
   "main": "exports.js",
@@ -8,7 +8,7 @@
     "start": "APP_ROOT=$(pwd) node ./src/server.js"
   },
   "keywords": [
-    "yeap-app-server-example"
+    "yeap_app_server_example"
   ],
   "author": "Pavel Taranov",
   "license": "MIT",

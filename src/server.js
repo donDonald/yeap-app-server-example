@@ -1,8 +1,8 @@
 'use strict';
 
 const assert = require('assert');
-const yeap = require('yeap-app-server');
-const Application = yeap.lib.Application;
+const yeap = require('yeap_app_server');
+const Application = yeap.app_server.Application;
 
 const openModel = function(api, cb) {
     const model = {};
@@ -27,7 +27,7 @@ const OPTS = {
     openModel:openModel
 };
 
-const app = new yeap.lib.Application(OPTS);
+const app = new Application(OPTS);
 
 app.open(()=>{
     assert.equal(true, app.isOpen());
