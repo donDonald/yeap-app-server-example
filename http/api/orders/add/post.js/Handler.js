@@ -17,22 +17,21 @@ module.exports = function (api) {
 //      console.log(`${this._logPrefix}.handle()`);
 
         const params = req.body;
-        const id = params.id;
         const name = params.name;
         const phone = params.phone;
 //      console.log(`${this._logPrefix}.handle, params:`, params);
-//      console.log(`${this._logPrefix}.handle, id:${id}`);
 //      console.log(`${this._logPrefix}.handle, name:${name}`);
 //      console.log(`${this._logPrefix}.handle, phone:${phone}`);
 
-        const orders = req.app.zzz.model.orders;
-
-        if (typeof orders[id] == 'undefined') {
-            orders[id] = {name:name, phone:phone};
-            res.status(200).json(orders[id]);
-        } else {
-            res.status(500).send(`Order ${id} already exists`);
-        }
+        const orders = g_application.model.orders;
+        orders.add({name:name, phone:phone}, (err, result)=>{
+            if(err) {
+                res.status(500);
+            } else {
+                assert(result);
+                res.status(200).json(result);
+            }
+        });
     }
 
     return Handler;

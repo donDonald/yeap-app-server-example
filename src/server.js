@@ -3,34 +3,31 @@
 const assert = require('assert');
 const yeap = require('yeap_app_server');
 const Application = yeap.app_server.Application;
+const Model = require('./Model');
 
-const openModel = function(api, cb) {
-    const model = {};
-    model.orders = {
-        "0": {
-            name: 'John',
-            phone: '111111111'
-        },
-        "1": {
-            name: 'Tom',
-            phone: '222222222'
-        },
-        "2": {
-            name: 'Jerry',
-            phone: '333333333'
-        }
-    };
+// Setup model
+const openModel = (app, cb)=>{
+    assert(app);
+    assert(cb);
+    const databases = app.databases;
+    const dbcs = Object.entries(databases.connections);
+    const dbc = dbcs[0][1];
+    const model = new Model(dbc);
     cb(undefined, model);
 }
 
-const OPTS = {
-    openModel:openModel
-};
+const dbName = Model.collectDbName();
+Model.createDatabase(dbName, (err)=>{
+    assert(!err);
 
-const app = new Application(OPTS);
+    const OPTS = {
+        openModel:openModel
+    };
 
-app.open(()=>{
-    assert.equal(true, app.isOpen());
-    Application.assertAppIsOpen(app);
+    const app = new Application(OPTS);
+    app.open(()=>{
+        assert.equal(true, app.isOpen);
+        Application.assertAppIsOpen(app);
+    });
 });
 

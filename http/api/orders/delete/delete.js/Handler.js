@@ -16,16 +16,19 @@ module.exports = function (api) {
     Handler.prototype.handle = function(req, res, next) {
 //      console.log(`${this._logPrefix}.handle()`);
 
-        const orders = req.app.zzz.model.orders;
-        let result = orders;
-
         const params = req.body;
         const id = params.id;
 //      console.log(`${this._logPrefix}.handle, params:`, params);
 //      console.log(`${this._logPrefix}.handle, id:`, id);
-        delete orders[id];
 
-        res.sendStatus(200);
+        const orders = g_application.model.orders;
+        orders.remove(id, (err)=>{
+            if(err) {
+                res.status(204);
+            } else {
+                res.sendStatus(200);
+            }
+        });
     }
 
     return Handler;
