@@ -2,6 +2,8 @@
 
 const assert = require('assert');
 const yeap = require('yeap_app_server');
+const yeap_db = require('yeap_db');
+const helpers = yeap_db.postgres.helpers;
 const Application = yeap.app_server.Application;
 const Model = require('./Model');
 
@@ -16,18 +18,34 @@ const openModel = (app, cb)=>{
     cb(undefined, model);
 }
 
-const dbName = Model.collectDbName();
-Model.createDatabase(dbName, (err)=>{
-    assert(!err);
+const OPTS = {
+    openModel:openModel
+};
 
-    const OPTS = {
-        openModel:openModel
-    };
 
+// Create app
+const createApp=()=>{
     const app = new Application(OPTS);
     app.open(()=>{
         assert.equal(true, app.isOpen);
         Application.assertAppIsOpen(app);
     });
+}
+
+
+// Create database and model
+const dbName = Model.collectDbName();
+helpers.exists(dbName, (err, exists)=>{
+    assert(!err, err);
+    if(!exists) {
+        Model.createDatabase(dbName, (err)=>{
+            assert(!err, err);
+            createApp();
+        });
+    } else {
+        createApp();
+    }
 });
+
+
 

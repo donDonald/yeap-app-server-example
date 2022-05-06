@@ -38,6 +38,10 @@
                 background: #ccffdd;
             }
 
+            table td {
+                text-align: center;
+            }
+
             .btn {
                 background-color: #8a5188;
             }
@@ -79,7 +83,7 @@
 
 
             function addItem(items, item) {
-                const str = `<tr class='element' element_id=${item.id}><td>${item.id}</td><td>${item.name}</td><td>${item.phone}</td><td class='link' onclick=main.deleteItem(${item.id})>delete</td></tr>`;
+                const str = `<tr class='element' element_id=${item.id}><td>${item.id}</td><td>${item.name}</td><td>${item.phone}</td><td>${item.ts}</td><td class='link' onclick=main.deleteItem(${item.id})>delete</td></tr>`;
                 items = items.add(str);
                 return items;
             }
@@ -101,7 +105,7 @@
                     let items = $();
                     const keys = Object.keys(result);
                     keys.forEach((k)=>{
-                        items = addItem(items, {id:k, name:result[k].name, phone:result[k].phone});
+                        items = addItem(items, {id:result[k].id, name:result[k].name, phone:result[k].phone, ts:result[k].ts});
                     });
 
                     const elements = $('#id_elements');
@@ -154,9 +158,11 @@
 
                             let items = $();
                             const item={};
-                            values.each((index, v)=>{
-                                item[v.name] = v.value;
-                            });
+                            for (const [key, value] of Object.entries(result)) {
+                                console.log(`--- ${key}: ${value}`);
+                                item[key] = value;
+                            }
+
                             items = addItem(items, item);
                             const elements = $('#id_elements');
                             elements.append(items);
@@ -292,6 +298,7 @@
                     <th>order id</th>
                     <th>client name</th>
                     <th>phone no</th>
+                    <th>date</th>
                     <th>delete</th>
                 </tr>
             </table>
@@ -306,11 +313,6 @@
                     <div class='dialog_header_text'></div>
                 </div>
                 <div class='dialog_content'>
-
-                    <div>
-                        <div class='inline'>order id</div>
-                        <input class='inline' type='text' name='id' value=''>
-                    </div>
 
                     <div>
                         <div class='inline'>customer</div>

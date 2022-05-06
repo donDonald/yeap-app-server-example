@@ -51,7 +51,8 @@ class Orders {
 
     list(cb) {
         const opts = {
-            keys: [Order.dbKeys.id, Order.dbKeys.name, Order.dbKeys.phone]
+            //keys: [Order.dbKeys.id, Order.dbKeys.name, Order.dbKeys.phone]
+            keys: Order.dbKeysArray,
         };
         this._run(opts, (err, elements)=>{
             cb(err, elements);
@@ -62,7 +63,6 @@ class Orders {
         const opts = {
             //keys: [Order.dbKeys.id, Order.dbKeys.name, Order.dbKeys.phone],
             keys: Order.dbKeysArray,
-            //keys: [Order.dbKeys.id, Order.dbKeys.name, Order.dbKeys.phone, Order.dbKeys.ts],
             where:{}
         };
         opts.where[Order.dbKeys.id] = id;
@@ -113,9 +113,7 @@ class Model {
         } else {
             assert(false, 'Incorrct set of parameters');
         }
-console.log('Model.create, 1');
         Model.createDatabase(_dbName, (err)=>{
-console.log('Model.create, 2');
             if (err) {
                 _cb(err);
             } else {
