@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS goods (
+    gid      VARCHAR(32) PRIMARY KEY,
+    name     VARCHAR(256) NOT NULL,
+    ts       TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_goods_gid ON goods (gid);
+

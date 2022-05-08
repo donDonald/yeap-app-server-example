@@ -132,8 +132,14 @@ class Model {
 
     static createDatabase(dbName, cb) {
         const quieries = [];
+        const customers = require('../config/schema/customers');
+        quieries.push(customers);
+        const goods = require('../config/schema/goods');
+        quieries.push(goods);
         const orders = require('../config/schema/orders');
         quieries.push(orders);
+        const orders_goods = require('../config/schema/orders_goods');
+        quieries.push(orders_goods);
         helpers.createAndQuery(dbName, quieries, (err)=>{
             cb(err);
         });
