@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS goods (
     gid      VARCHAR(32) PRIMARY KEY,
     name     VARCHAR(256) NOT NULL,
+    amount   INTEGER NOT NULL DEFAULT 0,
     ts       TIMESTAMP NOT NULL DEFAULT NOW()
 );
 

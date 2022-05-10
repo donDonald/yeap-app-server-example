@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS orders_goods (
     oid                   SERIAL NOT NULL REFERENCES orders(oid) ON DELETE CASCADE,
     gid                   VARCHAR(32) NOT NULL REFERENCES goods(gid) ON DELETE CASCADE,
+    amount                INTEGER NOT NULL DEFAULT 1,
     ts                    TIMESTAMP NOT NULL DEFAULT NOW(),
     PRIMARY KEY (oid, gid),
     UNIQUE (oid, gid)

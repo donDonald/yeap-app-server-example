@@ -3,98 +3,9 @@
 const assert = require('assert');
 const yeap_db = require('yeap_db');
 const helpers = yeap_db.postgres.helpers;
-assert(yeap_db.model.add);
-
-// Database Order record
-let Order = function (props) {
-    if (props.id) this.id = props.id;
-    if (props.ts) this.ts = props.ts;
-    if (props.name) this.name = props.name;
-    if (props.phone) this.phone = props.phone;
-}
-
-// \brief These keys are mant for mapping JS fileds to DB fields.
-//        Postgresql doesn't support camel-case notation.
-Order.dbKeys = {};
-Order.dbKeys.id = 'id';
-Order.dbKeys.ts = 'ts';
-Order.dbKeys.name = 'name';
-Order.dbKeys.phone = 'phone';
-Order.dbKeysArray = Object.values(Order.dbKeys);
-
-
-
-
-class Orders {
-    constructor(dbc) {
-        assert(dbc);
-        this._dbc = dbc;
-        this._count = yeap_db.model.count.bind(undefined, this._dbc, 'orders');
-        const inserter = function(values, value)
-        {
-            if (!values) {
-                return [];
-            }
-            values.push(value);
-            return values;
-        }
-        this._run = yeap_db.model.query.run.bind(undefined, this._dbc, 'orders', Order, inserter);
-        //this._add = yeap_db.model.add.bind(undefined, this._dbc, 'orders', Order);
-        this._delete = yeap_db.model.delete.bind(undefined, this._dbc, 'orders', 'id');
-    }
-
-    count(record, cb) {
-        this._count(record, (err, count)=>{
-            cb(err, count);
-        });
-    }
-
-    list(cb) {
-        const opts = {
-            //keys: [Order.dbKeys.id, Order.dbKeys.name, Order.dbKeys.phone]
-            keys: Order.dbKeysArray,
-        };
-        this._run(opts, (err, elements)=>{
-            cb(err, elements);
-        });
-    }
-
-    peek(id, cb) {
-        const opts = {
-            //keys: [Order.dbKeys.id, Order.dbKeys.name, Order.dbKeys.phone],
-            keys: Order.dbKeysArray,
-            where:{}
-        };
-        opts.where[Order.dbKeys.id] = id;
-        this._run(opts, (err, elements)=>{
-            if(err) {
-                cb(err);
-            } else {
-                const e = elements.length == 1 ? elements[0] : undefined;
-                cb(err, e);
-            }
-        });
-    }
-
-    add(record, cb) {
-        assert(record.name);
-        assert(record.phone);
-        const q = `INSERT INTO orders (name, phone) VALUES ('${record.name}', '${record.phone}') RETURNING id, name, phone, ts`;
-        this._dbc.query(q, [], (err, result)=>{
-            if(err) {
-                cb(err);
-            } else {
-                cb(err, result.rows[0]);
-            }
-        });
-    }
-
-    remove(id, cb) {
-        this._delete(id, (err)=>{
-            cb(err);
-        });
-    }
-}
+const Customers = require('./Customers');
+const Goods = require('./Goods');
+const Orders = require('./Orders');
 
 
 
@@ -154,7 +65,10 @@ class Model {
     constructor(dbc) {
         assert(dbc);
         this._dbc = dbc;
+        this._customers = new Customers(this._dbc);
+        this._goods = new Goods(this._dbc);
         this._orders = new Orders(this._dbc);
+        //this._orders_goods = new OrdersGoods(this._dbc);
     }
 
     close(cb) {
@@ -168,8 +82,20 @@ class Model {
         }
     }
 
+    get customers() {
+        return this._customers;
+    }
+
+    get goods() {
+        return this._goods;
+    }
+
     get orders() {
         return this._orders;
+    }
+
+    get orders_goods() {
+        return this._orders_goods;
     }
 }
 
