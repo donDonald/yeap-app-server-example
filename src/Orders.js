@@ -26,6 +26,9 @@ Record.dbKeysArray = Object.values(Record.dbKeys);
 
 
 class Orders {
+
+    static dbKeys = Record.dbKeys;
+
     constructor(dbc) {
         assert(dbc);
         this._dbc = dbc;

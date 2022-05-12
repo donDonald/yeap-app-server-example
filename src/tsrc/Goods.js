@@ -15,6 +15,15 @@ describe('Goods', ()=>{
         dbc.close(done);
     });
 
+    it('Check Goods.dbKeys', ()=>{
+        assert.equal(typeof Goods.dbKeys, 'object');
+        assert.equal(Object.keys(Goods.dbKeys).length, 4);
+        assert.equal(Goods.dbKeys.gid, 'gid');
+        assert.equal(Goods.dbKeys.name, 'name');
+        assert.equal(Goods.dbKeys.amount, 'amount');
+        assert.equal(Goods.dbKeys.ts, 'ts');
+    });
+
     it('Setup database, create model', (done)=>{
         const dbName = createDbName('main');
         Model.createDatabase(dbName, (err)=>{
@@ -62,7 +71,7 @@ describe('Goods', ()=>{
     });
 
     it('Create 1 record', (done)=>{
-        goods.create({gid:'A0001', name:'Washing Machine'}, (err, result)=>{
+        goods.create({gid:'A0001', name:'Washing Machine', amount:0}, (err, result)=>{
             assert(!err);
             assert(result);
             assert.equal(result.gid, 'A0001');
@@ -176,6 +185,7 @@ describe('Goods', ()=>{
                     {
                         gid:`A000${index}`,
                         name:`SomeName-${index}`,
+                        amount:0
                     },
                     (err)=>{
                         if(err) {

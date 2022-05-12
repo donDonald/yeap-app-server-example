@@ -28,6 +28,9 @@ Record.dbKeysArray = Object.values(Record.dbKeys);
 
 
 class Goods {
+
+    static dbKeys = Record.dbKeys;
+
     constructor(dbc) {
         assert(dbc);
         this._dbc = dbc;
@@ -63,7 +66,8 @@ class Goods {
     create(record, cb) {
         assert(record.gid);
         assert(record.name);
-        const q = `INSERT INTO goods (gid, name) VALUES ('${record.gid}', '${record.name}') RETURNING gid, name, amount, ts`;
+        assert.equal(typeof record.amount, 'number');
+        const q = `INSERT INTO goods (gid, name, amount) VALUES ('${record.gid}', '${record.name}', '${record.amount}') RETURNING gid, name, amount, ts`;
         this._dbc.query(q, [], (err, result)=>{
             if(err) {
                 cb(err);

@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Admin</title>
+
+        <script src="../jquery.min.js"></script>
+        <link   href="../main.css" rel="stylesheet">
+
+        <link   href="../dialogs.css" rel="stylesheet">
+        <script src="../dialogs.js"></script>
+        <script src="../helpers.js"></script>
+
+        <style>
+            nav {
+                background: #00802b;
+                padding: 20px 80px;
+                font-size: 20px;
+            }
+
+            main, header {
+                max-width: 90%;
+            }
+
+            .btn {
+                background-color: #8a5188;
+            }
+
+            .local-btn {
+                background-color: #00802b;
+            }
+
+            .dialog_header {
+                background-color: #7a2c78;
+            }
+
+            .dialog_content {
+                background-color: #8a5188;
+            }
+
+            .dialog_footer {
+                background-color: #7a2c78;
+            }
+
+            .dialog_close_btn {
+                color: #8a5188;
+            }
+
+            .left {
+                float: left;
+            //  width: 300px;
+            //  border: 3px solid #73AD21;
+            //  padding: 10px;
+            }
+
+            .right {
+                float: right;
+            //  width: 300px;
+            //  border: 3px solid #73AD21;
+            //  padding: 10px;
+            }
+
+            .clear {
+                clear: both;
+            }
+
+            #id_pages {
+                display: flex;
+                justify-content: center;
+                border-radius: 8px;
+                background-color: #fff;
+                box-sizing: unset;
+                box-shadow: 0 1px 2px 0 rgba(0,0,0,0.2);
+                border: solid 1px #f2f2f2;
+                height: 48px;
+                font-size: 16px;
+                list-style: none;
+                padding: 0;
+                text-align: center;
+            }
+
+            .page {
+                display: block;
+                width: 65px;
+                height: 49px;
+                box-sizing: border-box;
+                color: #8c8c8c;
+                cursor:pointer;
+            }
+            .page:hover{background-color:#fff7da;color:#00802b;}
+
+            .page_nav {
+                display: block;
+                width: 65px;
+                height: 49px;
+                box-sizing: border-box;
+                color: #8c8c8c;
+                cursor:pointer;
+            }
+            .page_nav:hover{background-color:#fff7da;color:#00802b;}
+
+            .page_disabled{cursor:not-allowed;color:#777}
+
+            .page_active {
+                border: #fff;
+                border-bottom-color: rgb(255, 255, 255);
+                border-bottom-style: none;
+                border-bottom-width: medium;
+                border-bottom: solid 3px #00802b;
+            }
+
+            .page_link {
+                display: block;
+                padding-top: 11px;
+                border: solid 3px  transparent;
+                text-decoration: none !important;
+                font-weight: bold;
+                font-size: 16px;
+                height: 100%;
+                box-sizing: border-box;
+            }
+
+            .elements_header {
+                text-align:left;
+            }
+
+            table {
+                border-collapse: collapse;
+                font-size: 18px;
+            }
+
+            table tr th {
+                background-color: #00b33c;
+                font-size: 20px;
+            }
+
+            table tr:nth-child(odd) {
+                background: #99ffbb;
+            }
+
+            table tr:nth-child(even) {
+                background: #ccffdd;
+            }
+
+            .inline { 
+                display: inline-block; 
+            //  border: 1px solid red; 
+                margin: 5px;
+            }
+
+            .fuckup {
+                background-color: #ff0000;
+            }
+        </style>
+
+        <script>
+            const getItemsCount = function() {
+                const text = $('#itemsCount option:selected').val();
+                return parseInt(text);
+            }
+
+
+
+            // https://www.w3schools.com/howto/howto_css_modals.asp
+            // https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_modal
+            class DialogAdd extends DialogExec {
+                constructor(opts) {
+                    super('id_dialog_add');
+                    this.opts = opts || {};
+                }
+
+                run() {
+                    console.log('DialogAdd.run()');
+                    this.setHeaderText(`Add new ${this.opts.itemName}`);
+                    this.show();
+
+                    // Setup focus to 1st input element
+                    const s = this.dialog.find('.dialog_content input');
+                    Object.values(s)[0].focus();
+
+                    this._promise = new DeferredPromise();
+                    return this._promise;
+                }
+
+                exec() {
+                    console.log('DialogAdd.exec()');
+                    return new Promise((resolve, reject) => {
+                        const data = {};
+                        const values = this.dialog.find('.dialog_content input');
+                        values.each((index, v)=>{
+                            data[v.name] = v.value;
+                        });
+                        console.log('DialogAdd.exec, data:', data);
+                        $.post(
+                            {
+                                url:this.opts.urls.add,
+                                data:data
+                            },
+                        ).done((result)=>{
+                            console.log('DialogAdd.exec, SUCCESS:', result);
+                            resolve(result);
+                        }).fail((result)=>{
+                            const err = `status:${result.status}, text:${result.statusText}`;
+                            console.log('DialogAdd.exec, FAILURE, err:', err);
+                            reject(err);
+                        });
+                    });
+                }
+            }
+
+
+
+            class DialogDelete extends DialogExec {
+                constructor(opts) {
+                    super('id_dialog_delete');
+                    this.opts = opts;
+                }
+
+                run(id) {
+                    console.log(`DialogDelete.run(), id:${id}`);
+                    this.elementId = id;
+                    this.setHeaderText(`Delete ${this.opts.itemName} ${this.elementId} ?`);
+                    this.show();
+
+                    this._promise = new DeferredPromise();
+                    return this._promise;
+                }
+
+                exec() {
+                    console.log('DialogDelete.exec()');
+                    return new Promise((resolve, reject) => {
+                        const data = {};
+                        data[this.opts.itemId] = this.elementId;
+                        console.log('DialogDelete.exec, data:', data);
+                        $.ajax(
+                            {
+                                type: 'DELETE',
+                                url:this.opts.urls.delete,
+                                data:data
+                            }
+                        ).done((result)=>{
+                            console.log('DialogDelete.exec, SUCCESS:', result);
+                            resolve(result);
+                        }).fail((result)=>{
+                            const err = `status:${result.status}, text:${result.statusText}`;
+                            reject(err);
+                        });
+                    });
+                }
+            }
+
+
+
+            class DialogFind extends DialogExec {
+                constructor(opts) {
+                    super('id_dialog_find');
+                    this.opts = opts;
+                    this.setHeaderText(`Find a ${this.opts.itemName}`);
+                }
+
+                run() {
+                    console.log('DialogFind.run()');
+                    this.show();
+                    this.dialog.find('.dialog_content input').focus();
+
+                    this._promise = new DeferredPromise();
+                    return this._promise;
+                }
+
+                exec() {
+                    console.log('DialogFind.exec()');
+                    return new Promise((resolve, reject) => {
+                        const data = {};
+                        data.key = this.dialog.find('option:selected').val();
+                        data.value = this.dialog.find('.dialog_content input').val();
+                        console.log('DialogFind.exec, data:', data);
+                        $.ajax({
+                            url:this.opts.urls.find,
+                            data:data
+                        }).done((result)=>{
+                            console.log('DialogFind.exec, SUCCESS:', result);
+                            resolve(result);
+                        }).fail((result)=>{
+                            const err = `status:${result.status}, text:${result.statusText}`;
+                            console.log('DialogFind.exec, FAILURE, err:', err);
+                            reject(err);
+                        });
+                    });
+                }
+            }
+
+            const ListIterator = function(opts, loadFoo) {
+                this.opts = opts;
+                this.cursor = {
+                    position: 0,
+                };
+
+                this.prepare = function(items) {
+                    this.totalCount = items.totalCount;
+                    console.log(`ListIterator.prepare(), totalCount:${this.totalCount}`);
+                    this.items = items[this.opts.name];
+                    return this;
+                };
+
+                this.reloadCurrent = function() {
+                    console.log('ListIterator.reloadCurrent()');
+                    this.position = undefined;
+                    this.loadFoo();
+                }
+
+                this.navigateFirst = function() {
+                    console.log('ListIterator.navigateFirst()');
+                    this.position = undefined;
+                    this.cursor.position = 0;
+                    this.loadFoo();
+                }
+
+                this.navigatePrevious = function() {
+                    console.log('ListIterator.navigatePrevious()');
+                    this.position = undefined;
+                    this.cursor.position -= Math.max(this.items.length, this.cursor.count);
+                    if (this.cursor.position < 0) this.cursor.position = 0;
+                    this.loadFoo();
+                }
+
+                this.navigateLast = function() {
+                    console.log('ListIterator.navigateLast()');
+                    this.position = undefined;
+                    const count = getItemsCount();
+                    let a = Math.floor(this.totalCount/this.cursor.count);
+                    this.cursor.position = a*count;
+                    if (this.totalCount == this.cursor.position) {
+                        --a;
+                        this.cursor.position -= count;
+                    }
+                    //console.log(`ListIterator.navigateLast(), count:${count}, totalCount:${this.totalCount}, cursor.count:${this.cursor.count}, cursor.position:${this.cursor.position}`);
+                    this.loadFoo();
+                }
+
+                this.navigateNext = function() {
+                    console.log('ListIterator.navigateNext()');
+                    this.position = undefined;
+                    this.cursor.position += this.items.length;
+                    this.loadFoo();
+                }
+
+                this.navigateToPage = function(pageIndex) {
+                    console.log('ListIterator.navigateToPage(), pageIndex:' + pageIndex);
+                    this.position = undefined;
+                    this.cursor.position = pageIndex * this.cursor.count;
+                    this.loadFoo();
+                }
+
+                this.peekNext = function() {
+                    console.log('ListIterator.peekNext()');
+                    console.log(`ListIterator.peekNext, cursor.position:${this.cursor.position}, items.length:${this.items.length}`);
+
+                    if (typeof this.position === 'undefined') {
+                        this.position = 0;
+                    }
+
+                    const limit = this.items.length;
+                    if (this.position >= limit) {
+                        this.position = undefined;
+                        console.log('ListIterator.peekNext, return undefined value');
+                        return undefined;
+                    }
+
+                    const v = this.items[this.position];
+                    const result = {index:this.position, value: v};
+                    ++this.position;
+                    console.log('ListIterator.peekNext, return:', result);
+                    return result;
+                }
+
+                this.handleDelete = function(id) {
+                    console.log('ListIterator.handleDelete(), id:' + id);
+                }
+
+                this.loadItems = function(cb) {
+                    console.log('ListIterator.loadItems()');
+                    this.cursor.count = getItemsCount();
+                    console.log('ListIterator.loadItems, cursor:', this.cursor);
+                    console.log(`ListIterator.loadItems, position:${this.cursor.position}, count:${this.cursor.count}`);
+                    $.ajax({
+                        url:this.opts.urls.list,
+                        data:this.cursor
+                    }).done((result)=>{
+                        console.log('ListIterator.loadItems, SUCCESS:', result);
+                        this.prepare(result);
+                        cb();
+                    }).fail((result)=>{
+                        console.log('ListIterator.loadItems, FAILURE:', result);
+                        alert('ListIterator.loadItems, FAILURE');
+                    });
+                }
+                this.loadFoo = this.loadItems.bind(this, loadFoo);
+            }
+
+            const FindIterator = function(opts, loadFoo) {
+                this.opts = opts;
+                this.loadFoo = loadFoo;
+                this.cursor = {
+                    position: 0,
+                };
+
+                this.prepare = function(items) {
+                    this.totalCount = items.totalCount;
+                    console.log(`FindIterator.prepare(), totalCount:${this.totalCount}`);
+                    this.items = items[this.opts.name];
+                    this.cursor.count = getItemsCount();
+                    return this;
+                };
+
+                this.reloadCurrent = function() {
+                    console.log('FindIterator.reloadCurrent()');
+                    this.position = undefined;
+                    this.loadFoo(this.cursor);
+                }
+
+                this.navigateFirst = function() {
+                    console.log('FindIterator.navigateFirst()');
+                    this.position = undefined;
+                    this.cursor.position = 0;
+                    this.loadFoo(this.cursor);
+                }
+
+                this.navigatePrevious = function() {
+                    console.log('FindIterator.navigatePrevious()');
+                    this.position = undefined;
+                    this.cursor.position -= this.cursor.count;
+                    if (this.cursor.position < 0) this.cursor.position = 0;
+                    this.loadFoo(this.cursor);
+                }
+
+                this.navigateLast = function() {
+                    console.log('FindIterator.navigateLast()');
+                    this.position = undefined;
+                    const count = getItemsCount();
+                    let a = Math.floor(this.totalCount/this.cursor.count);
+                    this.cursor.position = a*count;
+                    if (this.totalCount == this.cursor.position) {
+                        --a;
+                        this.cursor.position -= count;
+                    }
+                    //console.log(`FindIterator.navigateLast(), count:${count}, totalCount:${this.totalCount}, cursor.count:${this.cursor.count}, cursor.position:${this.cursor.position}`);
+                    this.loadFoo(this.cursor);
+                }
+
+                this.navigateNext = function() {
+                    console.log('FindIterator.navigateNext()');
+                    this.position = undefined;
+                    this.cursor.position += this.cursor.count;
+                    this.loadFoo(this.cursor);
+                }
+
+                this.navigateToPage = function(pageIndex) {
+                    console.log('FindIterator.navigateToPage(), pageIndex:' + pageIndex);
+                    this.position = undefined;
+                    this.cursor.position = pageIndex * this.cursor.count;
+                    this.loadFoo(this.cursor);
+                }
+
+                this.peekNext = function() {
+                    console.log('FindIterator.peekNext()');
+
+                    if (typeof this.position === 'undefined') {
+                        this.position = this.cursor.position;
+                    }
+
+                    const limit = this.cursor.position + this.cursor.count;
+                    const v = this.items[this.position];
+                    console.log(`FindIterator.peekNext, cursor.position:${this.cursor.position}, cursor.count:${this.cursor.count}, limit:${limit}, items.length:${this.items.length}`);
+                    if (this.position >= limit || 'undefined' === typeof v) {
+                        this.position = undefined;
+                        console.log('FindIterator.peekNext, return undefined value');
+                        return undefined;
+                    }
+
+                    const result = {index:this.position-this.cursor.position, value: v};
+                    ++this.position;
+                    console.log('FindIterator.peekNext, return:', result);
+                    return result;
+                }
+
+                this.handleDelete = function(id) {
+                    console.log('FindIterator.handleDelete(), id:' + id);
+                    const self = this;
+                    const i = this.items.findIndex((e)=>{ return e[self.opts.itemId] === id });
+                    if (i !== -1) {
+                        const v = this.items[i];
+                        this.items[i] = undefined;
+                        this.items.splice(i, 1);
+                    }
+                }
+            }
+
+            const Page = function(e) {
+                this.e = e;
+
+                this.enableMouse = function(enabled) {
+                    if (enabled) {
+                        this.e.removeClass('page_disabled');
+                    } else {
+                        this.e.addClass('page_disabled');
+                    }
+                }
+
+                this.click = function(fn) {
+                    let wrapper = function(foo) {
+                        const disabled = $(this.e).hasClass('page_disabled');
+                        if (!disabled) {
+                            foo();
+                        }
+                    }       
+                    const f = wrapper.bind(this, fn);
+                    this.e.click(f);
+                }
+            }
+
+            const Paginator = function(opts) {
+                this.ePages = $('#id_pages');
+                this.eElements = $('#id_elements');
+                this.opts = opts;
+
+                this.reloadCurrent = function() {
+                    return this.iterator.reloadCurrent();
+                }
+
+                this.navigateFirst = function() {
+                    return this.iterator.navigateFirst();
+                }
+
+                this.navigatePrevious = function() {
+                    return this.iterator.navigatePrevious();
+                }
+
+                this.navigateLast = function() {
+                    return this.iterator.navigateLast();
+                }
+
+                this.navigateNext = function() {
+                    return this.iterator.navigateNext();
+                }
+
+                this.navigateToPage = function(pageIndex) {
+                    return this.iterator.navigateToPage(pageIndex);
+                }
+
+                this.setup = function() {
+                    console.log('Paginator.setup()');
+                    let elements = $();
+
+                    //go 1st
+                    let str = `<li id='id_pages_first' class='page_nav'><div class='page_link'>&lt;&lt;</div></li>`;
+                    elements = elements.add(str);
+
+                    //go previous
+                    str = `<li id='id_pages_previous' class='page_nav'><div class='page_link'>&lt;</div></li>`;
+                    elements = elements.add(str);
+
+                    //go next
+                    str = `<li id='id_pages_next' class='page_nav'><div class='page_link'>&gt;</div></li>`;
+                    elements = elements.add(str);
+
+                    //go last
+                    str = `<li id='id_pages_last' class='page_nav'><div class='page_link'>&gt;&gt;</div></li>`;
+                    elements = elements.add(str);
+
+                    this.ePages.append(elements);
+
+                    this.eNavigateFirst = new Page($('#id_pages_first'));
+                    this.eNavigateFirst.click(this.navigateFirst.bind(this));
+
+                    this.eNavigatePrevious = new Page ($('#id_pages_previous'));
+                    this.eNavigatePrevious.click(this.navigatePrevious.bind(this));
+
+                    this.eNavigateLast = new Page($('#id_pages_last'));
+                    this.eNavigateLast.click(this.navigateLast.bind(this));
+
+                    this.eNavigateNext = new Page($('#id_pages_next'));
+                    this.eNavigateNext.click(this.navigateNext.bind(this));
+
+                    this.eNavigateFirst.enableMouse();
+                    this.eNavigatePrevious.enableMouse();
+
+                    this.eNavigateLast.enableMouse();
+                    this.eNavigateNext.enableMouse();
+                }
+
+                this.createListIterator = function() {
+                    console.log('Paginator.createListIterator()');
+                    const list = function() {
+                        console.log('Paginator.createListIterator.list()');
+                        this.listElements().listPages();
+                    }
+                    this.iterator = new ListIterator(this.opts, list.bind(this));
+                    return this.iterator;
+                }
+
+                this.createFindIterator = function() {
+                    console.log('Paginator.createFindIterator()');
+                    const list = function() {
+                        console.log('Paginator.createFindIterator.list()');
+                        this.listElements().listPages();
+                    }
+                    this.iterator = new FindIterator(this.opts, list.bind(this));
+                    return this.iterator;
+                }
+
+                this.listElements = function() {
+                    console.log('Paginator.listElements()');
+
+                    $('.element').remove();
+                    let elements = $();
+
+                    let e =  this.iterator.peekNext();
+                    while (e) {
+                        const v = e.value;
+                        const columns = Object.keys(v);
+                        if (0 === e.index) {
+                            let str = `<tr class='element'>`;
+                            columns.forEach((c)=>{str += `<th class='elements_header'>${c}</th>`});
+                            str += `<th class='elements_header'></th>`; // Delete placeholder
+                            str += '</tr>';
+                            elements = elements.add(str);
+                        }
+
+                        let str = `<tr class='element' element_id='${v[this.opts.itemId]}'>`;
+                        columns.forEach((c)=>{
+                            if (c === 'stts') {
+                                str += `<td class='elements_header'>${new Date(v[c]).toString()}</td>`;
+                            } else {
+                                str += `<td class='elements_header'>${v[c]}</td>`;
+                            }
+                        });
+                        str += `<td class='elements_header link' onclick=stuff.deleteItem('${v[this.opts.itemId]}')>Delete</td>`;
+                        str += '</tr>';
+                        elements = elements.add(str);
+                        e =  this.iterator.peekNext();
+                    }
+
+                    this.eElements.append(elements);
+                    return this;
+                }
+
+                this.listPages = function() {
+                    console.log('Paginator.listPages()');
+                    this.pagesCount = Math.ceil(this.iterator.totalCount/this.iterator.cursor.count);
+                    this.activePageNumber = Math.floor(this.iterator.cursor.position/this.iterator.cursor.count);
+                    console.log(`Paginator.listPages, pagesCount:${this.pagesCount}, activePageNumber:${this.activePageNumber}`);
+
+                    // Create pages
+                    $(".page").remove();
+                    let elements = $();
+                    // elements
+                    for(let i=0; i<this.pagesCount; ++i) {
+                        str = `<li class='page' page_number=${i}><div class='page_link'>${i+1}</div></li>`;
+                        elements = elements.add(str);
+
+                        const page = new Page(elements.last());
+                        page.click(this.navigateToPage.bind(this, i));
+                    }
+                    this.eNavigatePrevious.e.after(elements);
+
+                    // Update navigation buttons
+                    let enable = this.activePageNumber > 0;
+                    this.eNavigateFirst.enableMouse(enable);
+                    this.eNavigatePrevious.enableMouse(enable);
+
+                    enable = (this.pagesCount - this.activePageNumber) > 1;
+                    this.eNavigateLast.enableMouse(enable);
+                    this.eNavigateNext.enableMouse(enable);
+
+                    this.highlightActivePage();
+
+                    return this;
+                }
+
+                this.enableMouse = function(e, enabled) {
+                    if (enabled) {
+                        e.removeClass('page_disabled');
+                    } else {
+                        e.addClass('page_disabled');
+                    }
+                }
+
+                this.highlightActivePage = function() {
+                    console.log(`Paginator.highlightActivePage(), activePageNumber:${this.activePageNumber}`);
+                    $(`.page[page_number=${this.activePageNumber}]`).addClass('page_active');
+                }
+
+                this.handleDelete = function(id) {
+                    console.log(`Paginator.handleDelete(), id:${id}`);
+                    this.iterator.handleDelete(id);
+                    $(`.element[element_id=${id}]`).remove();
+                }
+            }
+
+            let stuff;
+            const Stuff = function() {
+                console.log('Stuff()');
+
+                this.opts = <%- JSON.stringify(templateOpts) %>;
+                console.log('Stuff, opts:', this.opts);
+
+                // Highlight current tab
+                $('#tab_'+this.opts.name + ' a').addClass('nav_li_current');
+
+                this.paginator = new Paginator(this.opts);
+
+                // Add dialog
+                this.dialogAdd = new DialogAdd(this.opts);
+                $('#id_add_btn').click(()=>{
+                    this.dialogAdd.run()
+                        .then((result)=>{
+                            if(result!=='Closed') this.paginator.reloadCurrent();
+                        })
+                        .catch(helpers.errorHandler);
+                });
+
+                // Delete dialog
+                this.dialogDelete = new DialogDelete(this.opts);
+                this.deleteItem = (id) =>{
+                    console.log('Stuff.deleteItem(), id:' + id);
+                    this.dialogDelete.run(id)
+                        .then((result)=>{
+                            if(result!=='Closed') this.paginator.handleDelete(id);
+                        })
+                        .catch(helpers.errorHandler);
+                }
+
+                // Find dialog
+                this.dialogFind = new DialogFind(this.opts);
+                const findHandler = function(result) {
+                    const items = {};
+                    items.totalCount = Object.keys(result).length;
+                    items[this.opts.name] = result;
+                    this.paginator.createFindIterator().prepare(items).navigateFirst();
+                }
+                $('#id_find_btn').click(()=>{
+                    this.dialogFind.run()
+                        .then((result)=>{
+                            if(result!=='Closed') findHandler.bind(this)(result);
+                        })
+                        .catch(helpers.errorHandler);
+                });
+
+                this.paginator.setup();
+                this.paginator.createListIterator().navigateFirst();
+            }
+
+
+            $(document).ready(()=>{stuff = new Stuff});
+
+        </script>
+    <head>
+
+    <body>
+        <nav>
+            <ul class='inline'>
+                <li id='tab_groups'><a href="/admin/goods">Goods</a></li>
+                <li id='tab_deployments'><a href="/admin/customers">Customers</a></li>
+                <li id='tab_users'><a href="/admin/orders">Orders</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <div class='left'>
+                <button id='id_add_btn' class='btn local-btn'>Add</button>
+                <button id='id_find_btn' class='btn local-btn'>Find</button>
+            </div>
+
+            <div class='right'>
+                <div class='inline'>Display items:</div>
+                <div class='inline'>
+                    <select id='itemsCount'>
+                      <option value=20>20</option>
+                      <option value=50>50</option>
+                      <option value=100>100</option>
+                    </select>
+                </div>
+            </div>
+
+            <!--
+            https://www.dns-shop.ru
+            https://css-tricks.com/almanac/properties/c/clear/
+            https://www.w3schools.com/css/css_align.asp
+            -->
+            <div class='clear'/></div>
+
+            <ul id='id_pages'>
+            </ul>
+
+            <table id='id_elements' style="width:100%">
+            </table>
+        </main>
+
+        <dialogs>
+            <div id='id_dialog_add' class='dialog'>
+                <div class='dialog_header'>
+                    <div class='dialog_close_btn'>&times;</div>
+                    <div class='dialog_header_text'></div>
+                </div>
+                <div class='dialog_content'>
+
+                    <% for (let i=0; i<templateKeys.length; ++i) { %>
+                    <div>
+                        <div class='inline'> <%= templateKeys[i] %> </div>
+                        <input class='inline' type='text' name='<%= templateKeys[i] %>' value=''>
+                    </div>
+                    <% } %>
+
+                </div>
+                <div class='dialog_footer'>
+                    <div class='btn'>Add</div>
+                </div>
+            </div>
+
+            <div id='id_dialog_delete' class='dialog'>
+                <div class='dialog_header'>
+                    <div class='dialog_close_btn'>&times;</div>
+                    <div class='dialog_header_text'></div>
+                </div>
+                <div class='dialog_footer'>
+                    <div class='btn'>Delete</div>
+                </div>
+            </div>
+
+            <div id='id_dialog_find' class='dialog'>
+                <div class='dialog_header'>
+                    <div class='dialog_close_btn'>&times;</div>
+                    <div class='dialog_header_text'></div>
+                </div>
+                <div class='dialog_content'>
+                    <div class='inline'>By</div>
+     
+                    <div class='inline'>
+                        <select>
+                            <% for (let i=0; i<templateKeys.length; ++i) { %>
+                            <option value='<%= templateKeys[i] %>'><%= templateKeys[i] %></option>
+                            <% } %>
+                        </select>
+                    </div>
+
+                    <input class='inline' type='text' value=''>
+                </div>
+                <div class='dialog_footer'>
+                    <div class='inline btn'>Find</div>
+                </div>
+            </div>
+
+            <div id='id_dialog_failure' class='dialog'>
+                <div class='dialog_header fuckup'>
+                    <div class='dialog_close_btn fuckup'>&times;</div>
+                    <div class='dialog_header_text fuckup'></div>
+                </div>
+                <div class='dialog_content fuckup'/>
+            </div>
+        </dialogs>
+
+    <body>
+</html>

@@ -15,7 +15,20 @@ module.exports = function (api) {
 
     Handler.prototype.handle = function(req, res, next) {
 //      console.log(`${this._logPrefix}.handle()`);
-        res.render('home');
+
+        const params = req.body;
+        const gid = params.gid;
+//      console.log(`${this._logPrefix}.handle, params:`, params);
+//      console.log(`${this._logPrefix}.handle, gid:`, gid);
+
+        const container = g_application.model.goods;
+        container.remove(gid, (err)=>{
+            if(err) {
+                res.status(204);
+            } else {
+                res.sendStatus(200);
+            }
+        });
     }
 
     return Handler;

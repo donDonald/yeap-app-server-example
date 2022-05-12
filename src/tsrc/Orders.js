@@ -22,6 +22,14 @@ describe('Orders', ()=>{
 
     let goodA0001, goodA0002, goodA0003;
     describe('Basic', (done)=>{
+        it('Check Orders.dbKeys', ()=>{
+            assert.equal(typeof Orders.dbKeys, 'object');
+            assert.equal(Object.keys(Orders.dbKeys).length, 3);
+            assert.equal(Orders.dbKeys.oid, 'oid');
+            assert.equal(Orders.dbKeys.cid, 'cid');
+            assert.equal(Orders.dbKeys.ts, 'ts');
+        });
+
         it('Setup database, create model', (done)=>{
             const dbName = createDbName('main');
             Model.createDatabase(dbName, (err)=>{
@@ -71,7 +79,7 @@ describe('Orders', ()=>{
         });
 
         it('Create good A0001', (done)=>{
-            goods.create({gid:'A0001', name:'Super Ping-Pong'}, (err, result)=>{
+            goods.create({gid:'A0001', name:'Super Ping-Pong', amount:0}, (err, result)=>{
                 assert(!err);
                 assert(result);
                 assert.equal(result.gid, 'A0001');
@@ -84,7 +92,7 @@ describe('Orders', ()=>{
         });
 
         it('Create good A0002', (done)=>{
-            goods.create({gid:'A0002', name:'Mega Mass'}, (err, result)=>{
+            goods.create({gid:'A0002', name:'Mega Mass', amount:0}, (err, result)=>{
                 assert(!err);
                 assert(result);
                 assert.equal(result.gid, 'A0002');
@@ -97,7 +105,7 @@ describe('Orders', ()=>{
         });
 
         it('Create good A0003', (done)=>{
-            goods.create({gid:'A0003', name:'Space Quest 5'}, (err, result)=>{
+            goods.create({gid:'A0003', name:'Space Quest 5', amount:0}, (err, result)=>{
                 assert(!err);
                 assert(result);
                 assert.equal(result.gid, 'A0003');

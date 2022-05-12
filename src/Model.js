@@ -97,6 +97,10 @@ class Model {
     get orders_goods() {
         return this._orders_goods;
     }
+
+    static Goods = Goods;
+    static Customers = Customers;
+    static Orders = Orders;
 }
 
 module.exports = Model;

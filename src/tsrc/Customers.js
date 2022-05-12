@@ -15,6 +15,15 @@ describe('Customers', ()=>{
         dbc.close(done);
     });
 
+    it('Check Customers.dbKeys', ()=>{
+        assert.equal(typeof Customers.dbKeys, 'object');
+        assert.equal(Object.keys(Customers.dbKeys).length, 4);
+        assert.equal(Customers.dbKeys.cid, 'cid');
+        assert.equal(Customers.dbKeys.name, 'name');
+        assert.equal(Customers.dbKeys.phone, 'phone');
+        assert.equal(Customers.dbKeys.ts, 'ts');
+    });
+
     it('Setup database, create model', (done)=>{
         const dbName = createDbName('main');
         Model.createDatabase(dbName, (err)=>{

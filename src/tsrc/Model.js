@@ -44,6 +44,10 @@ describe('Model', ()=>{
 
 
     describe('Customers basics', ()=>{
+        it('Check Model.Customers', ()=>{
+            assert.equal(typeof Model.Customers, 'function');
+        });
+
         it('Count empty customers', (done)=>{
             model.customers.count((err, count)=>{
                 assert(!err);
@@ -101,6 +105,10 @@ describe('Model', ()=>{
 
 
     describe('Goods basics', ()=>{
+        it('Check Model.Goods', ()=>{
+            assert.equal(typeof Model.Goods, 'function');
+        });
+
         it('Count empty goods', (done)=>{
             model.goods.count((err, count)=>{
                 assert(!err);
@@ -127,7 +135,7 @@ describe('Model', ()=>{
 
         it('Add 5 goods', (done)=>{
             const ctor = (index)=>{
-                return {name:`SuperGood-${index}`, gid:`A000${index}`};
+                return {name:`SuperGood-${index}`, gid:`A000${index}`, amount:0};
             }
             const add = (v, cb)=>{
                 model.goods.create(v, cb);
@@ -158,6 +166,10 @@ describe('Model', ()=>{
 
 
     describe('Orders basics', ()=>{
+        it('Check Model.Orders', ()=>{
+            assert.equal(typeof Model.Orders, 'function');
+        });
+
         it('Count empty orders', (done)=>{
             model.orders.count((err, count)=>{
                 assert(!err);
