@@ -121,7 +121,7 @@
             }
 
             .elements_header {
-                text-align:left;
+                text-align: center;
             }
 
             table {
@@ -140,6 +140,10 @@
 
             table tr:nth-child(even) {
                 background: #ccffdd;
+            }
+
+            table td {
+                text-align: center;
             }
 
             .inline { 
@@ -628,10 +632,10 @@
 
                         let str = `<tr class='element' element_id='${v[this.opts.itemId]}'>`;
                         columns.forEach((c)=>{
-                            if (c === 'stts') {
-                                str += `<td class='elements_header'>${new Date(v[c]).toString()}</td>`;
+                            if (c === 'ts') {
+                                str += `<td>${new Date(v[c]).toString()}</td>`;
                             } else {
-                                str += `<td class='elements_header'>${v[c]}</td>`;
+                                str += `<td>${v[c]}</td>`;
                             }
                         });
                         str += `<td class='elements_header link' onclick=stuff.deleteItem('${v[this.opts.itemId]}')>Delete</td>`;

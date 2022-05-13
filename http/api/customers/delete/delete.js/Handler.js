@@ -17,12 +17,12 @@ module.exports = function (api) {
 //      console.log(`${this._logPrefix}.handle()`);
 
         const params = req.body;
-        const cid = params.cid;
+        const id = params.cid;
 //      console.log(`${this._logPrefix}.handle, params:`, params);
-//      console.log(`${this._logPrefix}.handle, cid:`, cid);
+//      console.log(`${this._logPrefix}.handle, id:`, id);
 
         const container = g_application.model.customers;
-        container.remove(cid, (err)=>{
+        container.remove(id, (err)=>{
             if(err) {
                 res.status(204);
             } else {

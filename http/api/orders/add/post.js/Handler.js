@@ -17,14 +17,12 @@ module.exports = function (api) {
 //      console.log(`${this._logPrefix}.handle()`);
 
         const params = req.body;
-        const name = params.name;
-        const phone = params.phone;
+        const id = params.cid;
 //      console.log(`${this._logPrefix}.handle, params:`, params);
-//      console.log(`${this._logPrefix}.handle, name:${name}`);
-//      console.log(`${this._logPrefix}.handle, phone:${phone}`);
+//      console.log(`${this._logPrefix}.handle, id:${id}`);
 
-        const orders = g_application.model.orders;
-        orders.add({name:name, phone:phone}, (err, result)=>{
+        const container = g_application.model.orders;
+        container.create({cid:id}, (err, result)=>{
             if(err) {
                 res.status(500);
             } else {

@@ -16,13 +16,13 @@ module.exports = function (api) {
     Handler.prototype.handle = function(req, res, next) {
 //      console.log(`${this._logPrefix}.handle()`);
 
-        const orders = g_application.model.orders;
+        const container = g_application.model.orders;
         let result;
         let code = 200;
 
-        const gid = req.query.gid;
-        if (gid) {
-            orders.peek(gid, (err, e)=>{
+        const id = req.query.oid;
+        if (id) {
+            container.peek(id, (err, e)=>{
                 if (err) {
                     code = 500;
                 } else {
@@ -32,11 +32,13 @@ module.exports = function (api) {
                 res.status(code).json(result);
             });
         } else {
-            orders.list((err, elements)=>{
+            container.list((err, elements)=>{
                 if (err) {
                     code = 500;
                 } else {
-                    result = elements;
+                    result = {};
+                    result.totalCount = elements.length;
+                    result.orders = elements;
                     if(!result) code = 204;
                 }
                 res.status(code).json(result);

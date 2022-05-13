@@ -6,7 +6,7 @@ describe('http.api.orders.delete.delete.js', ()=>{
     let api;
     let Router, Response, Delete;
     let helpers, Model, createDbName;
-    let addOrders;
+    let addOrders, addCustomers;
     before(()=>{
         api = require('yeap_app_server');
         Router = api.lib.express.Router;
@@ -16,9 +16,9 @@ describe('http.api.orders.delete.delete.js', ()=>{
         helpers = yeap_db.postgres.helpers;
         Model = require('../../../../../../src/Model');
         createDbName=(name)=>{ return yeap_db.Db.createDbName('http_api_orders_delete_post_') + name };
-        addOrders = (index, count, cb)=>{
+        addCustomers = (index, count, cb)=>{
             if(index<count) {
-                model.orders.add(
+                model.customers.create(
                     {
                         name:`SomeName-${index}`,
                         phone:`${index}${index}${index}`
@@ -27,7 +27,24 @@ describe('http.api.orders.delete.delete.js', ()=>{
                         if(err) {
                             cb(err);
                         } else {
-                            addOrders(index+1, count, cb);
+                            addCustomers(index+1, count, cb);
+                        }
+                    });
+            } else {
+                cb();
+            }
+        }
+        addOrders = (getCidFoo, index, count, cb)=>{
+            if(index<count) {
+                model.orders.create(
+                    {
+                        cid:getCidFoo(index),
+                    },
+                    (err)=>{
+                        if(err) {
+                            cb(err);
+                        } else {
+                            addOrders(getCidFoo, index+1, count, cb);
                         }
                     });
             } else {
@@ -66,8 +83,25 @@ describe('http.api.orders.delete.delete.js', ()=>{
             model.close(done);
         });
 
+        let customers;
+        it('Create 10 customers', (done)=>{
+            addCustomers(0, 10, (err)=>{
+                assert(!err);
+                model.customers.list((err, elements)=>{
+                    assert(!err);
+                    customers = elements;
+                  //console.log('customers:'); console.dir(customers);
+                    done();
+                });
+            })
+        });
+
         it('Add 10 orders', (done)=>{
-            addOrders(0, 10, (err)=>{
+            const getCid = (index)=>{
+                return customers[index].cid;
+            }
+
+            addOrders(getCid, 0, 10, (err)=>{
                 assert(!err);
                 done();
             });
@@ -84,7 +118,7 @@ describe('http.api.orders.delete.delete.js', ()=>{
         it('Delete not existing order', (done)=>{
             const req = new Delete(
                 {
-                    id:'1000',
+                    oid:'1000',
                 }
             );
 
@@ -107,7 +141,7 @@ describe('http.api.orders.delete.delete.js', ()=>{
         it('Delete existing order 1', (done)=>{
             const req = new Delete(
                 {
-                    id:'1',
+                    oid:'1',
                 }
             );
 
@@ -130,7 +164,7 @@ describe('http.api.orders.delete.delete.js', ()=>{
         it('Delete existing order 2', (done)=>{
             const req = new Delete(
                 {
-                    id:'2',
+                    oid:'2',
                 }
             );
 
@@ -153,7 +187,7 @@ describe('http.api.orders.delete.delete.js', ()=>{
         it('Delete existing order 3', (done)=>{
             const req = new Delete(
                 {
-                    id:'3',
+                    oid:'3',
                 }
             );
 
@@ -190,8 +224,25 @@ describe('http.api.orders.delete.delete.js', ()=>{
             model.close(done);
         });
 
+        let customers;
+        it('Create 10 customers', (done)=>{
+            addCustomers(0, 10, (err)=>{
+                assert(!err);
+                model.customers.list((err, elements)=>{
+                    assert(!err);
+                    customers = elements;
+                  //console.log('customers:'); console.dir(customers);
+                    done();
+                });
+            })
+        });
+
         it('Add 10 orders', (done)=>{
-            addOrders(0, 10, (err)=>{
+            const getCid = (index)=>{
+                return customers[index].cid;
+            }
+
+            addOrders(getCid, 0, 10, (err)=>{
                 assert(!err);
                 done();
             });

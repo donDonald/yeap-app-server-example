@@ -6,6 +6,7 @@ describe('http.api.orders.add.post.js', ()=>{
     let api;
     let Router, Response, Post;
     let helpers, Model, createDbName;
+    let addCustomers;
     before(()=>{
         api = require('yeap_app_server');
         Router = api.lib.express.Router;
@@ -15,6 +16,24 @@ describe('http.api.orders.add.post.js', ()=>{
         helpers = yeap_db.postgres.helpers;
         Model = require('../../../../../../src/Model');
         createDbName=(name)=>{ return yeap_db.Db.createDbName('http_api_orders_add_post_') + name };
+        addCustomers = (index, count, cb)=>{
+            if(index<count) {
+                model.customers.create(
+                    {
+                        name:`SomeName-${index}`,
+                        phone:`${index}${index}${index}`
+                    },
+                    (err)=>{
+                        if(err) {
+                            cb(err);
+                        } else {
+                            addCustomers(index+1, count, cb);
+                        }
+                    });
+            } else {
+                cb();
+            }
+        }
     });
 
     let router, method, model;
@@ -47,38 +66,50 @@ describe('http.api.orders.add.post.js', ()=>{
             model.close(done);
         });
 
+        let customers;
+        it('Create 10 customers', (done)=>{
+            addCustomers(0, 10, (err)=>{
+                assert(!err);
+                model.customers.list((err, elements)=>{
+                    assert(!err);
+                    customers = elements;
+                  //console.log('customers:'); console.dir(customers);
+                    done();
+                });
+            })
+        });
+
         it('Create order 0', (done)=>{
             const req = new Post(
                 {
-                    name:'userA',
-                    phone:'0000000',
+                    cid:customers[0].cid,
                 }
             );
 
             const res = new Response();
             res.wait(()=>{
-                //console.log('res:', res);
+              //console.log('res:', res);
                 assert.equal(200, res.result.code);
                 assert(res.result.value);
 
                 const order = res.result.value;
-                assert.equal(4, Object.keys(order).length);
-                assert(order.id);
-                assert.equal(order.name, 'userA');
-                assert.equal(order.phone, '0000000');
+                assert.equal(3, Object.keys(order).length);
+                assert(order.oid);
+                assert.equal(order.cid, customers[0].cid);
                 assert(order.ts);
 
                 model.orders.count((err, count)=>{
                     assert(!err, err);
                     assert.equal(count, 1);
-                    model.orders.peek(order.id.toString(), (err, e)=>{
+                    model.orders.peek(order.oid, (err, e)=>{
                         assert(!err, err);
                         assert(e);
                         assert.equal(4, Object.keys(e).length);
-                        assert.equal(e.id, order.id);
-                        assert.equal(e.name, order.name);
-                        assert.equal(e.phone, order.phone);
-                        //assert.equal(e.ts, order.ts);
+                        assert.equal(e.oid, order.oid);
+                        assert.equal(e.cid, order.cid);
+                        assert(e.ts);
+                        assert(e.goods);
+                        assert.equal(Object.keys(e.goods).length, 0);
                         done();
                     });
                 });
@@ -90,8 +121,7 @@ describe('http.api.orders.add.post.js', ()=>{
         it('Create order 1', (done)=>{
             const req = new Post(
                 {
-                    name:'userB',
-                    phone:'1111111',
+                    cid:customers[1].cid,
                 }
             );
 
@@ -102,23 +132,23 @@ describe('http.api.orders.add.post.js', ()=>{
                 assert(res.result.value);
 
                 const order = res.result.value;
-                assert(order.id);
-                assert.equal(4, Object.keys(order).length);
-                assert.equal(order.name, 'userB');
-                assert.equal(order.phone, '1111111');
+                assert.equal(3, Object.keys(order).length);
+                assert(order.oid);
+                assert.equal(order.cid, customers[1].cid);
                 assert(order.ts);
 
                 model.orders.count((err, count)=>{
                     assert(!err, err);
                     assert.equal(count, 2);
-                    model.orders.peek(order.id.toString(), (err, e)=>{
+                    model.orders.peek(order.oid, (err, e)=>{
                         assert(!err, err);
                         assert(e);
                         assert.equal(4, Object.keys(e).length);
-                        assert.equal(e.id, order.id);
-                        assert.equal(e.name, order.name);
-                        assert.equal(e.phone, order.phone);
-                        //assert.equal(e.ts, order.ts);
+                        assert.equal(e.oid, order.oid);
+                        assert.equal(e.cid, order.cid);
+                        assert(e.ts);
+                        assert(e.goods);
+                        assert.equal(Object.keys(e.goods).length, 0);
                         done();
                     });
                 });
@@ -130,8 +160,7 @@ describe('http.api.orders.add.post.js', ()=>{
         it('Create order 2', (done)=>{
             const req = new Post(
                 {
-                    name:'userC',
-                    phone:'2222222',
+                    cid:customers[2].cid,
                 }
             );
 
@@ -142,23 +171,23 @@ describe('http.api.orders.add.post.js', ()=>{
                 assert(res.result.value);
 
                 const order = res.result.value;
-                assert(order.id);
-                assert.equal(4, Object.keys(order).length);
-                assert.equal(order.name, 'userC');
-                assert.equal(order.phone, '2222222');
+                assert.equal(3, Object.keys(order).length);
+                assert(order.oid);
+                assert.equal(order.cid, customers[2].cid);
                 assert(order.ts);
 
                 model.orders.count((err, count)=>{
                     assert(!err, err);
                     assert.equal(count, 3);
-                    model.orders.peek(order.id.toString(), (err, e)=>{
+                    model.orders.peek(order.oid, (err, e)=>{
                         assert(!err, err);
                         assert(e);
                         assert.equal(4, Object.keys(e).length);
-                        assert.equal(e.id, order.id);
-                        assert.equal(e.name, order.name);
-                        assert.equal(e.phone, order.phone);
-                        //assert.equal(e.ts, order.ts);
+                        assert.equal(e.oid, order.oid);
+                        assert.equal(e.cid, order.cid);
+                        assert(e.ts);
+                        assert(e.goods);
+                        assert.equal(Object.keys(e.goods).length, 0);
                         done();
                     });
                 });
@@ -184,16 +213,28 @@ describe('http.api.orders.add.post.js', ()=>{
             model.close(done);
         });
 
-        it('Create an order, missing name field', (done)=>{
+        let customers;
+        it('Create 10 customers', (done)=>{
+            addCustomers(0, 10, (err)=>{
+                assert(!err);
+                model.customers.list((err, elements)=>{
+                    assert(!err);
+                    customers = elements;
+                  //console.log('customers:'); console.dir(customers);
+                    done();
+                });
+            })
+        });
+
+        it('Create an order, missing cid field', (done)=>{
             const req = new Post(
                 {
-                    phone:'3333333',
                 }
             );
 
             const res = new Response();
             res.wait(()=>{
-                //console.log('res:', res);
+              //console.log('res:', res);
                 assert.equal(400, res.result.code);
                 model.orders.count((err, count)=>{
                     assert(!err, err);
@@ -204,40 +245,17 @@ describe('http.api.orders.add.post.js', ()=>{
 
             router.handle(method.route, req, res, router.next);        
         });
-
-        it('Create an order, missing phone field', (done)=>{
-            const req = new Post(
-                {
-                    name:'userD',
-                }
-            );
-
-            const res = new Response();
-            res.wait(()=>{
-                //console.log('res:', res);
-                assert.equal(400, res.result.code);
-                model.orders.count((err, count)=>{
-                    assert(!err, err);
-                    assert.equal(count, 0);
-                    done();
-                });
-            });
-
-            router.handle(method.route, req, res, router.next);        
-        });
-
 
         it('Create proper order now', (done)=>{
             const req = new Post(
                 {
-                    name:'userD',
-                    phone:'3333333',
+                    cid:customers[0].cid,
                 }
             );
 
             const res = new Response();
             res.wait(()=>{
-                //console.log('res:', res);
+              //console.log('res:', res);
                 assert.equal(200, res.result.code);
                 model.orders.count((err, count)=>{
                     assert(!err, err);

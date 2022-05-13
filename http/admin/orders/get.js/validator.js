@@ -8,7 +8,6 @@ module.exports = function(api) {
 
     const rules = () => {
         return [
-            check('oid').exists().isString().notEmpty(),
         ];
     }
 

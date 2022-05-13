@@ -6,7 +6,7 @@ describe('http.api.orders.get.js', ()=>{
     let api;
     let Router, Response, Get;
     let helpers, Model, createDbName;
-    let addOrders;
+    let addOrders, addCustomers;
     before(()=>{
         api = require('yeap_app_server');
         Router = api.lib.express.Router;
@@ -16,9 +16,9 @@ describe('http.api.orders.get.js', ()=>{
         helpers = yeap_db.postgres.helpers;
         Model = require('../../../../../src/Model');
         createDbName=(name)=>{ return yeap_db.Db.createDbName('http_api_orders_get_') + name };
-        addOrders = (index, count, cb)=>{
+        addCustomers = (index, count, cb)=>{
             if(index<count) {
-                model.orders.add(
+                model.customers.create(
                     {
                         name:`SomeName-${index}`,
                         phone:`${index}${index}${index}`
@@ -27,7 +27,24 @@ describe('http.api.orders.get.js', ()=>{
                         if(err) {
                             cb(err);
                         } else {
-                            addOrders(index+1, count, cb);
+                            addCustomers(index+1, count, cb);
+                        }
+                    });
+            } else {
+                cb();
+            }
+        }
+        addOrders = (getCidFoo, index, count, cb)=>{
+            if(index<count) {
+                model.orders.create(
+                    {
+                        cid:getCidFoo(index),
+                    },
+                    (err)=>{
+                        if(err) {
+                            cb(err);
+                        } else {
+                            addOrders(getCidFoo, index+1, count, cb);
                         }
                     });
             } else {
@@ -74,7 +91,7 @@ describe('http.api.orders.get.js', ()=>{
 
             const res = new Response();
             res.wait(()=>{
-                //console.log('res:', res);
+              //console.log('res:', res);
                 assert.equal(200, res.result.code);
                 assert(res.result.value);
 
@@ -88,8 +105,24 @@ describe('http.api.orders.get.js', ()=>{
             router.handle(method.route, req, res, router.next);        
         });
 
+        let customers;
+        it('Create 10 customers', (done)=>{
+            addCustomers(0, 10, (err)=>{
+                assert(!err);
+                model.customers.list((err, elements)=>{
+                    assert(!err);
+                    customers = elements;
+                  //console.log('customers:'); console.dir(customers);
+                    done();
+                });
+            })
+        });
+
         it('Add 1 record', (done)=>{
-            addOrders(0, 1, (err)=>{
+            const getCid = (index)=>{
+                return customers[index].cid;
+            }
+            addOrders(getCid, 0, 1, (err)=>{
                 assert(!err);
                 model.orders.count((err, count)=>{
                     assert(!err);
@@ -107,15 +140,15 @@ describe('http.api.orders.get.js', ()=>{
 
             const res = new Response();
             res.wait(()=>{
-                //console.log('res:', res);
+              //console.log('res:', res);
                 assert.equal(200, res.result.code);
                 assert(res.result.value);
 
-                const orders = res.result.value;
+                const orders = res.result.value.orders;
                 assert.equal(1, Object.keys(orders).length);
-                assert.equal(orders[0].id, '1');
-                assert.equal(orders[0].name, 'SomeName-0');
-                assert.equal(orders[0].phone, '000');
+                assert.equal(orders[0].oid, 1);
+                assert.equal(orders[0].cid, customers[0].cid);
+                assert(orders[0].ts);
                 done();
             });
 
@@ -123,7 +156,10 @@ describe('http.api.orders.get.js', ()=>{
         });
 
         it('Add 5 records', (done)=>{
-            addOrders(1, 6, (err)=>{
+            const getCid = (index)=>{
+                return customers[index].cid;
+            }
+            addOrders(getCid, 1, 6, (err)=>{
                 assert(!err);
                 model.orders.count((err, count)=>{
                     assert(!err);
@@ -141,30 +177,24 @@ describe('http.api.orders.get.js', ()=>{
 
             const res = new Response();
             res.wait(()=>{
-                //console.log('res:', res);
+              //console.log('res:', res);
                 assert.equal(200, res.result.code);
                 assert(res.result.value);
 
-                const orders = res.result.value;
+                const orders = res.result.value.orders;
                 assert.equal(1+5, Object.keys(orders).length);
-                assert.equal(orders[0].id, '1');
-                assert.equal(orders[0].name, 'SomeName-0');
-                assert.equal(orders[0].phone, '000');
-                    assert.equal(orders[1].id, '2');
-                    assert.equal(orders[1].name, 'SomeName-1');
-                    assert.equal(orders[1].phone, '111');
-                assert.equal(orders[2].id, '3');
-                assert.equal(orders[2].name, 'SomeName-2');
-                assert.equal(orders[2].phone, '222');
-                    assert.equal(orders[3].id, '4');
-                    assert.equal(orders[3].name, 'SomeName-3');
-                    assert.equal(orders[3].phone, '333');
-                assert.equal(orders[4].id, '5');
-                assert.equal(orders[4].name, 'SomeName-4');
-                assert.equal(orders[4].phone, '444');
-                    assert.equal(orders[5].id, '6');
-                    assert.equal(orders[5].name, 'SomeName-5');
-                    assert.equal(orders[5].phone, '555');
+                assert.equal(orders[0].oid, '1');
+                assert.equal(orders[0].cid, customers[0].cid);
+                    assert.equal(orders[1].oid, '2');
+                    assert.equal(orders[1].cid, customers[1].cid);
+                assert.equal(orders[2].oid, '3');
+                assert.equal(orders[2].cid, customers[2].cid);
+                    assert.equal(orders[3].oid, '4');
+                    assert.equal(orders[3].cid, customers[3].cid);
+                assert.equal(orders[4].oid, '5');
+                assert.equal(orders[4].cid, customers[4].cid);
+                    assert.equal(orders[5].oid, '6');
+                    assert.equal(orders[5].cid, customers[5].cid);
                 done();
             });
 
@@ -174,19 +204,19 @@ describe('http.api.orders.get.js', ()=>{
         it('Collecting order by id', (done)=>{
             const req = new Get(
                 {
-                    id:'1'
+                    oid:'1'
                 }
             );
 
             const res = new Response();
             res.wait(()=>{
-                //console.log('res:', res);
+              //console.log('res:', res);
                 assert.equal(200, res.result.code);
                 assert(res.result.value);
 
                 const order = res.result.value;
-                assert.equal(order.name, 'SomeName-0');
-                assert.equal(order.phone, '000');
+                assert.equal(order.oid, 1);
+                assert.equal(order.cid, 1);
                 done();
             });
 
@@ -213,7 +243,7 @@ describe('http.api.orders.get.js', ()=>{
         it('Collecting order by missing id', (done)=>{
             const req = new Get(
                 {
-                    id:'1000'
+                    oid:'1000'
                 }
             );
 

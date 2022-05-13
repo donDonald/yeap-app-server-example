@@ -8,8 +8,7 @@ module.exports = function(api) {
 
     const rules = () => {
         return [
-            check('name').exists().matches(/^[A-Za-z ]+$/),
-            check('phone').exists().isString().notEmpty(),
+            check('cid').exists().matches(/^[0-9 ]+$/)
         ];
     }
 
