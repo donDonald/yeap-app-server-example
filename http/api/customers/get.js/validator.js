@@ -9,8 +9,8 @@ module.exports = function(api) {
     const rules = () => {
         return [
             oneOf([
-                check('id').not().exists(),
-                check('id').exists().isString().notEmpty(),
+                check('cid').not().exists(),
+                check('cid').exists().isString().notEmpty(),
             ]),
         ];
     }

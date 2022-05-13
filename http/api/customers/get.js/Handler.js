@@ -20,9 +20,9 @@ module.exports = function (api) {
         let result;
         let code = 200;
 
-        const id = req.query.id;
-        if (id) {
-            container.peek(id, (err, e)=>{
+        const cid = req.query.cid;
+        if (cid) {
+            container.peek(cid, (err, e)=>{
                 if (err) {
                     code = 500;
                 } else {

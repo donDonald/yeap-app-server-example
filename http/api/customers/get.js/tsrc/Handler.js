@@ -171,22 +171,22 @@ describe('http.api.customers.get.js', ()=>{
             router.handle(method.route, req, res, router.next);        
         });
 
-        it('Collecting order by id', (done)=>{
+        it('Collecting customer by id', (done)=>{
             const req = new Get(
                 {
-                    id:'1'
+                    cid:'1'
                 }
             );
 
             const res = new Response();
             res.wait(()=>{
-                //console.log('res:', res);
+              //console.log('res:', res);
                 assert.equal(200, res.result.code);
                 assert(res.result.value);
 
-                const order = res.result.value;
-                assert.equal(order.name, 'SomeName-0');
-                assert.equal(order.phone, '000');
+                const customer = res.result.value;
+                assert.equal(customer.name, 'SomeName-0');
+                assert.equal(customer.phone, '000');
                 done();
             });
 
@@ -210,16 +210,16 @@ describe('http.api.customers.get.js', ()=>{
             model.close(done);
         });
 
-        it('Collecting order by missing id', (done)=>{
+        it('Collecting customer by missing id', (done)=>{
             const req = new Get(
                 {
-                    id:'1000'
+                    cid:'1000'
                 }
             );
 
             const res = new Response();
             res.wait(()=>{
-                //console.log('res:', res);
+              //console.log('res:', res);
                 assert.equal(204, res.result.code);
                 assert(!res.result.value);
                 done();

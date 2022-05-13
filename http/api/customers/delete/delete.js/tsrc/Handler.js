@@ -1,12 +1,12 @@
 'use strict';
 
-describe('http.api.orders.delete.delete.js', ()=>{
+describe('http.api.customers.delete.delete.js', ()=>{
 
     const assert = require('assert');
     let api;
     let Router, Response, Delete;
     let helpers, Model, createDbName;
-    let addOrders;
+    let addCustomers;
     before(()=>{
         api = require('yeap_app_server');
         Router = api.lib.express.Router;
@@ -15,10 +15,10 @@ describe('http.api.orders.delete.delete.js', ()=>{
         const yeap_db = require('yeap_db');
         helpers = yeap_db.postgres.helpers;
         Model = require('../../../../../../src/Model');
-        createDbName=(name)=>{ return yeap_db.Db.createDbName('http_api_orders_delete_post_') + name };
-        addOrders = (index, count, cb)=>{
+        createDbName=(name)=>{ return yeap_db.Db.createDbName('http_api_customers_delete_post_') + name };
+        addCustomers = (index, count, cb)=>{
             if(index<count) {
-                model.orders.add(
+                model.customers.create(
                     {
                         name:`SomeName-${index}`,
                         phone:`${index}${index}${index}`
@@ -27,7 +27,7 @@ describe('http.api.orders.delete.delete.js', ()=>{
                         if(err) {
                             cb(err);
                         } else {
-                            addOrders(index+1, count, cb);
+                            addCustomers(index+1, count, cb);
                         }
                     });
             } else {
@@ -39,10 +39,10 @@ describe('http.api.orders.delete.delete.js', ()=>{
     let router, method, model;
     describe('Setup', ()=>{
         it('Create method', ()=>{
-            const ROUTE = '/api/orders/delete';
+            const ROUTE = '/api/customers/delete';
             const METHOD = 'DELETE';
             router = new Router();
-            method = api.app_server.routerHelper.createHandler(router, 'http/api/orders/delete/delete.js');
+            method = api.app_server.routerHelper.createHandler(router, 'http/api/customers/delete/delete.js');
             assert.equal(method.route, ROUTE);
             assert.equal(method.method, METHOD);
             Delete = Delete.bind(undefined, (req)=>{
@@ -66,25 +66,25 @@ describe('http.api.orders.delete.delete.js', ()=>{
             model.close(done);
         });
 
-        it('Add 10 orders', (done)=>{
-            addOrders(0, 10, (err)=>{
+        it('Add 10 customers', (done)=>{
+            addCustomers(0, 10, (err)=>{
                 assert(!err);
                 done();
             });
         });
 
-        it('Count orders', (done)=>{
-            model.orders.count((err, count)=>{
+        it('Count customers', (done)=>{
+            model.customers.count((err, count)=>{
                 assert(!err);
                 assert.equal(count, 10);
                 done();
             });
         });
 
-        it('Delete not existing order', (done)=>{
+        it('Delete not existing customer', (done)=>{
             const req = new Delete(
                 {
-                    id:'1000',
+                    cid:'1000',
                 }
             );
 
@@ -94,7 +94,7 @@ describe('http.api.orders.delete.delete.js', ()=>{
                 assert.equal(200, res.result.code);
                 assert(!res.result.value);
 
-                model.orders.count((err, count)=>{
+                model.customers.count((err, count)=>{
                     assert(!err, err);
                     assert.equal(count, 10);
                     done();
@@ -104,10 +104,10 @@ describe('http.api.orders.delete.delete.js', ()=>{
             router.handle(method.route, req, res, router.next);        
         });
 
-        it('Delete existing order 1', (done)=>{
+        it('Delete existing customer 1', (done)=>{
             const req = new Delete(
                 {
-                    id:'1',
+                    cid:'1',
                 }
             );
 
@@ -117,7 +117,7 @@ describe('http.api.orders.delete.delete.js', ()=>{
                 assert.equal(200, res.result.code);
                 assert(!res.result.value);
 
-                model.orders.count((err, count)=>{
+                model.customers.count((err, count)=>{
                     assert(!err, err);
                     assert.equal(count, 9);
                     done();
@@ -127,10 +127,10 @@ describe('http.api.orders.delete.delete.js', ()=>{
             router.handle(method.route, req, res, router.next);        
         });
 
-        it('Delete existing order 2', (done)=>{
+        it('Delete existing customer 2', (done)=>{
             const req = new Delete(
                 {
-                    id:'2',
+                    cid:'2',
                 }
             );
 
@@ -140,7 +140,7 @@ describe('http.api.orders.delete.delete.js', ()=>{
                 assert.equal(200, res.result.code);
                 assert(!res.result.value);
 
-                model.orders.count((err, count)=>{
+                model.customers.count((err, count)=>{
                     assert(!err, err);
                     assert.equal(count, 8);
                     done();
@@ -150,10 +150,10 @@ describe('http.api.orders.delete.delete.js', ()=>{
             router.handle(method.route, req, res, router.next);        
         });
 
-        it('Delete existing order 3', (done)=>{
+        it('Delete existing customer 3', (done)=>{
             const req = new Delete(
                 {
-                    id:'3',
+                    cid:'3',
                 }
             );
 
@@ -163,7 +163,7 @@ describe('http.api.orders.delete.delete.js', ()=>{
                 assert.equal(200, res.result.code);
                 assert(!res.result.value);
 
-                model.orders.count((err, count)=>{
+                model.customers.count((err, count)=>{
                     assert(!err, err);
                     assert.equal(count, 7);
                     done();
@@ -190,22 +190,22 @@ describe('http.api.orders.delete.delete.js', ()=>{
             model.close(done);
         });
 
-        it('Add 10 orders', (done)=>{
-            addOrders(0, 10, (err)=>{
+        it('Add 10 customers', (done)=>{
+            addCustomers(0, 10, (err)=>{
                 assert(!err);
                 done();
             });
         });
 
-        it('Count orders', (done)=>{
-            model.orders.count((err, count)=>{
+        it('Count customers', (done)=>{
+            model.customers.count((err, count)=>{
                 assert(!err);
                 assert.equal(count, 10);
                 done();
             });
         });
 
-        it('Delete order, missing id', (done)=>{
+        it('Delete customer, missing id', (done)=>{
             const req = new Delete(
                 {
                 }
@@ -222,8 +222,8 @@ describe('http.api.orders.delete.delete.js', ()=>{
             router.handle(method.route, req, res, router.next);        
         });
 
-        it('Count orders', (done)=>{
-            model.orders.count((err, count)=>{
+        it('Count customers', (done)=>{
+            model.customers.count((err, count)=>{
                 assert(!err);
                 assert.equal(count, 10);
                 done();

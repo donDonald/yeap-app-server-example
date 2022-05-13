@@ -20,9 +20,9 @@ module.exports = function (api) {
         let result;
         let code = 200;
 
-        const id = req.query.id;
-        if (id) {
-            orders.peek(id, (err, e)=>{
+        const gid = req.query.gid;
+        if (gid) {
+            orders.peek(gid, (err, e)=>{
                 if (err) {
                     code = 500;
                 } else {
