@@ -51,8 +51,12 @@ class Model {
         quieries.push(orders);
         const orders_goods = require('../config/schema/orders_goods');
         quieries.push(orders_goods);
-        helpers.createAndQuery(dbName, quieries, (err)=>{
-            cb(err);
+        helpers.createAndQuery(dbName, quieries, (err, dbc)=>{
+            if(dbc) {
+                dbc.close(()=>{
+                    cb(err);
+                });
+            }
         });
     }
 
