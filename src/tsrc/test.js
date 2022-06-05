@@ -4,5 +4,5 @@ require('./Customers');
 require('./Goods');
 require('./Orders');
 require('./Model');
-//require('../../http/tsrc/test');
+require('../../http/tsrc/test');
 

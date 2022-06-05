@@ -12,10 +12,9 @@ describe('http.api.customers.delete.delete.js', ()=>{
         Router = api.lib.express.Router;
         Response = api.lib.express.Response;
         Delete = api.lib.express.Delete;
-        const yeap_db = require('yeap_db');
-        helpers = yeap_db.postgres.helpers;
+        helpers = api.db.postgres.helpers;
         Model = require('../../../../../../src/Model');
-        createDbName=(name)=>{ return yeap_db.Db.createDbName('http_api_customers_delete_post_') + name };
+        createDbName=(name)=>{ return api.db.Db.createDbName('http_api_customers_delete_post_') + name };
         addCustomers = (index, count, cb)=>{
             if(index<count) {
                 model.customers.create(

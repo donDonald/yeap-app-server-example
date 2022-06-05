@@ -11,10 +11,9 @@ describe('http.api.customers.add.post.js', ()=>{
         Router = api.lib.express.Router;
         Response = api.lib.express.Response;
         Post = api.lib.express.Post;
-        const yeap_db = require('yeap_db');
-        helpers = yeap_db.postgres.helpers;
+        helpers = api.db.postgres.helpers;
         Model = require('../../../../../../src/Model');
-        createDbName=(name)=>{ return yeap_db.Db.createDbName('http_api_customers_add_post_') + name };
+        createDbName=(name)=>{ return api.db.Db.createDbName('http_api_customers_add_post_') + name };
     });
 
     let router, method, model;

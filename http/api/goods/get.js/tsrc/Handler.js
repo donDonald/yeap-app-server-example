@@ -12,10 +12,9 @@ describe('http.api.goods.get.js', ()=>{
         Router = api.lib.express.Router;
         Response = api.lib.express.Response;
         Get = api.lib.express.Get;
-        const yeap_db = require('yeap_db');
-        helpers = yeap_db.postgres.helpers;
+        helpers = api.db.postgres.helpers;
         Model = require('../../../../../src/Model');
-        createDbName=(name)=>{ return yeap_db.Db.createDbName('http_api_goods_get_') + name };
+        createDbName=(name)=>{ return api.db.Db.createDbName('http_api_goods_get_') + name };
         addGoods = (index, count, cb)=>{
             if(index<count) {
                 model.goods.create(
