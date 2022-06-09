@@ -9,9 +9,9 @@ describe('http.api.orders.get.js', ()=>{
     let addOrders, addCustomers;
     before(()=>{
         api = require('yeap_app_server');
-        Router = api.lib.express.Router;
-        Response = api.lib.express.Response;
-        Get = api.lib.express.Get;
+        Router = api.express.Router;
+        Response = api.express.Response;
+        Get = api.express.Get;
         helpers = api.db.postgres.helpers;
         Model = require('../../../../../src/Model');
         createDbName=(name)=>{ return api.db.Db.createDbName('http_api_orders_get_') + name };

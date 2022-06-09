@@ -11,7 +11,7 @@ module.exports = function(api) {
         ];
     }
 
-    const validate = api.lib.validators.validate;
+    const validate = api.validators.validate;
 
     return {
         rules,

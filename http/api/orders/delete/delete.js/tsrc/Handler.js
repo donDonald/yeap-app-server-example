@@ -9,9 +9,9 @@ describe('http.api.orders.delete.delete.js', ()=>{
     let addOrders, addCustomers;
     before(()=>{
         api = require('yeap_app_server');
-        Router = api.lib.express.Router;
-        Response = api.lib.express.Response;
-        Delete = api.lib.express.Delete;
+        Router = api.express.Router;
+        Response = api.express.Response;
+        Delete = api.express.Delete;
         helpers = api.db.postgres.helpers;
         Model = require('../../../../../../src/Model');
         createDbName=(name)=>{ return api.db.Db.createDbName('http_api_orders_delete_post_') + name };
