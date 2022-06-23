@@ -35,10 +35,10 @@ const createApp=()=>{
 
 // Create database and model
 const dbName = Model.collectDbName();
-helpers.exists(dbName, (err, exists)=>{
+helpers.exists(helpers.DB_CRIDENTIALS, dbName, (err, exists)=>{
     assert(!err, err);
     if(!exists) {
-        Model.createDatabase(dbName, (err)=>{
+        Model.createDatabase(helpers.DB_CRIDENTIALS, dbName, (err)=>{
             assert(!err, err);
             createApp();
         });

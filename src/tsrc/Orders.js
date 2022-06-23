@@ -32,9 +32,9 @@ describe('Orders', ()=>{
 
         it('Setup database, create model', (done)=>{
             const dbName = createDbName('main');
-            Model.createDatabase(dbName, (err)=>{
+            Model.createDatabase(helpers.DB_CRIDENTIALS, dbName, (err)=>{
                 assert(!err, err);
-                helpers.connect(dbName, (err, db)=>{
+                helpers.connect(helpers.DB_CRIDENTIALS, dbName, (err, db)=>{
                     assert(!err, err);
                     assert(db);
                     dbc = db;

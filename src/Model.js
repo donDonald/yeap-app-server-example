@@ -12,7 +12,7 @@ const Orders = require('./Orders');
 
 class Model {
 
-    static create(dbName, cb) {
+    static create(dbCridentials, dbName, cb) {
         let _dbName, _cb;
         if(typeof dbName == 'string') {
             assert.equal(typeof cb, 'function');
@@ -24,11 +24,11 @@ class Model {
         } else {
             assert(false, 'Incorrct set of parameters');
         }
-        Model.createDatabase(_dbName, (err)=>{
+        Model.createDatabase(dbCridentials, _dbName, (err)=>{
             if (err) {
                 _cb(err);
             } else {
-                helpers.connect(_dbName, (err, db)=>{
+                helpers.connect(dbCridentials, _dbName, (err, db)=>{
                     if (err) {
                         _cb(err);
                     } else {
@@ -41,7 +41,7 @@ class Model {
         });
     }
 
-    static createDatabase(dbName, cb) {
+    static createDatabase(dbCridentials, dbName, cb) {
         const quieries = [];
         const customers = require('../config/schema/customers');
         quieries.push(customers);
@@ -51,7 +51,7 @@ class Model {
         quieries.push(orders);
         const orders_goods = require('../config/schema/orders_goods');
         quieries.push(orders_goods);
-        helpers.createAndQuery(dbName, quieries, (err, dbc)=>{
+        helpers.createAndQuery(dbCridentials, dbName, quieries, (err, dbc)=>{
             if(dbc) {
                 dbc.close(()=>{
                     cb(err);

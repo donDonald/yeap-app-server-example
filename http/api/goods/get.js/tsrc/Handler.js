@@ -59,7 +59,7 @@ describe('http.api.goods.get.js', ()=>{
         before((done)=>{
             assert(!global.g_application);
             global.g_application = {};
-            Model.create(createDbName('main'), (err, m)=>{
+            Model.create(helpers.DB_CRIDENTIALS, createDbName('main'), (err, m)=>{
                 model = m;
                 g_application.model = model;
                 done();
@@ -203,7 +203,7 @@ describe('http.api.goods.get.js', ()=>{
         before((done)=>{
             assert(!global.g_application);
             global.g_application = {};
-            Model.create(createDbName('errors'), (err, m)=>{
+            Model.create(helpers.DB_CRIDENTIALS, createDbName('errors'), (err, m)=>{
                 model = m;
                 g_application.model = model;
                 done();

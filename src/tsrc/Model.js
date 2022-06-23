@@ -28,7 +28,7 @@ describe('Model', ()=>{
                 cb();
             }
         }
-        Model.create(dbName, (err, m)=>{
+        Model.create(helpers.DB_CRIDENTIALS, dbName, (err, m)=>{
             assert(!err, err);
             assert(m);
             model = m;
