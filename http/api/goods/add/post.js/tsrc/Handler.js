@@ -14,6 +14,11 @@ describe('http.api.goods.add.post.js', ()=>{
         helpers = api.db.postgres.helpers;
         Model = require('../../../../../../src/Model');
         createDbName=(name)=>{ return api.db.Db.createDbName('http_api_goods_add_post_') + name };
+        process.env.APP_ROOT = __dirname + '/../../../../../../';
+    });
+
+    after(()=>{
+        process.env.APP_ROOT = undefined;
     });
 
     let router, method, model;

@@ -33,6 +33,11 @@ describe('http.api.orders.add.post.js', ()=>{
                 cb();
             }
         }
+        process.env.APP_ROOT = __dirname + '/../../../../../../';
+    });
+
+    after(()=>{
+        process.env.APP_ROOT = undefined;
     });
 
     let router, method, model;

@@ -4,7 +4,7 @@
   "description": "",
   "main": "exports.js",
   "scripts": {
-    "test": "APP_ROOT=$(pwd) mocha 'src/tsrc/test.js' --timeout 10000",
+    "test": "mocha 'src/tsrc/test.js' --timeout 20000",
     "start": "APP_ROOT=$(pwd) node ./src/server.js"
   },
   "keywords": [

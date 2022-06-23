@@ -34,6 +34,11 @@ describe('http.api.goods.get.js', ()=>{
                 cb();
             }
         }
+        process.env.APP_ROOT = __dirname + '/../../../../../';
+    });
+
+    after(()=>{
+        process.env.APP_ROOT = undefined;
     });
 
     let router, method, model;
