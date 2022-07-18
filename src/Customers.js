@@ -71,7 +71,7 @@ class Customers {
             if(err) {
                 cb(err);
             } else {
-                const value = new Record(result.rows[0]);
+                const value = new Record(result[0]);
                 cb(err, value);
             }
         });

@@ -68,7 +68,7 @@ class Orders {
             if(err) {
                 cb(err);
             } else {
-                const value = new Record(result.rows[0]);
+                const value = new Record(result[0]);
                 cb(err, value);
             }
         });
@@ -89,22 +89,22 @@ class Orders {
             if(err) {
                 cb(err);
             } else {
-                if(result.rowCount == 0) {
+                if(result.length == 0) {
                     cb(err, undefined);
                 } else {
-                    const order = result.rows[0];
+                    const order = result[0];
                     order.goods = {};
                     q=`SELECT orders_goods.oid, orders.ts, orders_goods.gid, orders_goods.amount, goods.name FROM orders_goods LEFT JOIN goods ON orders_goods.gid=goods.gid LEFT JOIN orders ON orders.oid=orders_goods.oid WHERE orders_goods.oid='${id}'`;
                     this._dbc.query(q, [], (err, result)=>{
                         //console.log('peek() >>>>>>>>>>>>>>>>>>>>>>');
-                        //console.dir(result.rows);
+                        //console.dir(result);
                         //console.log('<<<<<<<<<<<<<<<<<<<<<<');
                         if(err) {
                             cb(err);
                         } else {
-                            if (result.rowCount) {
-                                for(let i=0; i<result.rowCount; ++i) {
-                                    const r = result.rows[i];
+                            if (result.length) {
+                                for(let i=0; i<result.length; ++i) {
+                                    const r = result[i];
                                     order.goods[r.gid] = {gid:r.gid, name:r.name, amount:r.amount};
                                 }
                             }
@@ -120,15 +120,15 @@ class Orders {
         let q = `SELECT oid, cid, ts FROM orders WHERE cid='${cid}'`;
         this._dbc.query(q, [], (err, result)=>{
           //console.log('peekByCustomer() >>>>>>>>>>>>>>>>>>>>>>');
-          //console.dir(result.rows);
+          //console.dir(result);
           //console.log('<<<<<<<<<<<<<<<<<<<<<<');
             if(err) {
                 cb(err);
             } else {
                 let orders;
-                for(let i=0; i<result.rowCount; ++i) {
+                for(let i=0; i<result.length; ++i) {
                     orders = orders || {};
-                    const order = result.rows[i];
+                    const order = result[i];
                     order.goods = {};
                     orders[order.oid] = order;
                 }
@@ -136,13 +136,13 @@ class Orders {
                 const q=`SELECT orders_goods.oid, orders.ts, orders.cid, orders_goods.gid, orders_goods.amount, goods.name FROM orders_goods LEFT JOIN goods ON orders_goods.gid=goods.gid LEFT JOIN orders ON orders.oid=orders_goods.oid WHERE orders.cid='${cid}'`;
                 this._dbc.query(q, [], (err, result)=>{
                   //console.log('peekByCustomer() >>>>>>>>>>>>>>>>>>>>>>');
-                  //console.dir(result.rows);
+                  //console.dir(result);
                   //console.log('<<<<<<<<<<<<<<<<<<<<<<');
                     if(err) {
                         cb(err);
                     } else {
-                        for(let i=0; i<result.rowCount; ++i) {
-                            const r = result.rows[i];
+                        for(let i=0; i<result.length; ++i) {
+                            const r = result[i];
                             const order = orders[r.oid];
                             //order.goods = order.goods || {};
                             order.goods[r.gid] = {gid:r.gid, name:r.name, amount:r.amount};
@@ -162,7 +162,7 @@ class Orders {
                 let q = `UPDATE goods SET amount = amount - ${goodAmount} WHERE gid = '${gid}' RETURNING amount`;
                 this._dbc.query(q, [], (err, result)=>{
                     if(this._dbc.transaction.shouldAbort(err, cb)) return;
-                    const amountLeft = result.rows[0].amount;
+                    const amountLeft = result[0].amount;
                     if(amountLeft < 0) {
                        this._dbc.transaction.shouldAbort(`Not enough amount of good, requested:${goodAmount}, left:${amountLeft+goodAmount}`, (err)=>{
                            cb(err);

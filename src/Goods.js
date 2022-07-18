@@ -72,7 +72,7 @@ class Goods {
             if(err) {
                 cb(err);
             } else {
-                const value = new Record(result.rows[0]);
+                const value = new Record(result[0]);
                 cb(err, value);
             }
         });
@@ -110,8 +110,8 @@ class Goods {
                 cb(err);
             } else {
                 let amount = 0;
-                if (result.rowCount != 0) {
-                    amount = result.rows[0].amount
+                if (result.length != 0) {
+                    amount = result[0].amount
                 }
                 cb(err, amount);
             }
@@ -129,7 +129,7 @@ class Goods {
                 const q = `UPDATE goods SET amount = amount + ${amount} WHERE gid = '${gid}' RETURNING amount`;
                 this._dbc.query(q, [], (err, result)=>{
                     if(this._dbc.transaction.shouldAbort(err, cb)) return;
-                    const amount2 = result.rows[0].amount;
+                    const amount2 = result[0].amount;
                     if (amount2 > 0) {
                         // Positive amount means adding
                         this._dbc.transaction.commit(cb, amount2);
@@ -153,7 +153,7 @@ class Goods {
             if(err) {
                 cb(err);
             } else {
-                cb(err, result.rows[0].amount);
+                cb(err, result[0].amount);
             }
         });
     }
