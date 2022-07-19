@@ -15,6 +15,6 @@
   "dependencies": {
     "ejs": "^3.1.6",
     "hostile": "^1.3.3",
-    "yeap_app_server": "git+https://github.com/donDonald/yeap_app_server.git#db27650169da8cff6b0574deb2c0c071ea832277"
+    "yeap_app_server": "git+https://github.com/donDonald/yeap_app_server.git#d54045ffd275c247152cbb0d20a891188647d84f"
   }
 }
