@@ -5,7 +5,7 @@
   "main": "exports.js",
   "scripts": {
     "test": "mocha 'src/tsrc/test.js' --timeout 20000",
-    "start": "APP_ROOT=$(pwd) node ./src/server.js"
+    "start": "YEAP_APP_SERVER_ROOT=$(pwd) node ./src/server.js"
   },
   "keywords": [
     "yeap_app_server_example"

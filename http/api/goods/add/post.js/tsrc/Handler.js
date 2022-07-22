@@ -1,6 +1,6 @@
 'use strict';
 
-describe('http.api.goods.add.post.js', ()=>{
+describe('yeap_app_server_example.http.api.goods.add.post.js', ()=>{
 
     const assert = require('assert');
     let api;
@@ -8,17 +8,17 @@ describe('http.api.goods.add.post.js', ()=>{
     let helpers, Model, createDbName;
     before(()=>{
         api = require('yeap_app_server');
-        Router = api.express.Router;
-        Response = api.express.Response;
-        Post = api.express.Post;
+        Router = api.dev_tools.express.Router;
+        Response = api.dev_tools.express.Response;
+        Post = api.dev_tools.express.Post;
         helpers = api.db.postgres.helpers;
         Model = require('../../../../../../src/Model');
         createDbName=(name)=>{ return api.db.Db.createDbName('http_api_goods_add_post_') + name };
-        process.env.APP_ROOT = __dirname + '/../../../../../../';
+        process.env.YEAP_APP_SERVER_ROOT = __dirname + '/../../../../../../';
     });
 
     after(()=>{
-        process.env.APP_ROOT = undefined;
+        process.env.YEAP_APP_SERVER_ROOT = undefined;
     });
 
     let router, method, model;
