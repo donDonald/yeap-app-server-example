@@ -13,6 +13,6 @@
   "author": "Pavel Taranov",
   "license": "MIT",
   "dependencies": {
-    "yeap_app_server": "git+https://github.com/donDonald/yeap_app_server.git#c54de38cb74b762c1041f382e3de6a9f6721227f"
+    "yeap_app_server": "git+https://github.com/donDonald/yeap_app_server.git#HEAD"
   }
 }
