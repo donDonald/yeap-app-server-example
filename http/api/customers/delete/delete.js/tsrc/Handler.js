@@ -1,6 +1,6 @@
 'use strict';
 
-describe('http.api.customers.delete.delete.js', ()=>{
+describe('yeap_app_server_example.http.api.customers.delete.delete.js', ()=>{
 
     const assert = require('assert');
     let api;
@@ -9,9 +9,9 @@ describe('http.api.customers.delete.delete.js', ()=>{
     let addCustomers;
     before(()=>{
         api = require('yeap_app_server');
-        Router = api.express.Router;
-        Response = api.express.Response;
-        Delete = api.express.Delete;
+        Router = api.dev_tools.express.Router;
+        Response = api.dev_tools.express.Response;
+        Delete = api.dev_tools.express.Delete;
         helpers = api.db.postgres.helpers;
         Model = require('../../../../../../src/Model');
         createDbName=(name)=>{ return api.db.Db.createDbName('http_api_customers_delete_post_') + name };
@@ -33,11 +33,11 @@ describe('http.api.customers.delete.delete.js', ()=>{
                 cb();
             }
         }
-        process.env.APP_ROOT = __dirname + '/../../../../../../';
+        process.env.YEAP_APP_SERVER_ROOT = __dirname + '/../../../../../../';
     });
 
     after(()=>{
-        process.env.APP_ROOT = undefined;
+        process.env.YEAP_APP_SERVER_ROOT = undefined;
     });
 
     let router, method, model;
