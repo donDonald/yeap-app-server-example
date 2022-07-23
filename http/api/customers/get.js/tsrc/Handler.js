@@ -9,9 +9,10 @@ describe('yeap_app_server_example.http.api.customers.get.js', ()=>{
     let addCustomers;
     before(()=>{
         api = require('yeap_app_server');
-        Router = api.dev_tools.express.Router;
-        Response = api.dev_tools.express.Response;
-        Get = api.dev_tools.express.Get;
+        const dev_tools = require('yeap_dev_tools');
+        Router = dev_tools.express.Router;
+        Response = dev_tools.express.Response;
+        Get = dev_tools.express.Get;
         helpers = api.db.postgres.helpers;
         Model = require('../../../../../src/Model');
         createDbName=(name)=>{ return api.db.Db.createDbName('http_api_customers_get_') + name };
